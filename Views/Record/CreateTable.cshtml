@@ -2,12 +2,29 @@
     ViewData["Title"] = "Table Creation";
 }
 
+<script>
+    $(document).ready(function() {
+        $("#AddColumn").click(function() { 
+                tc = parseInt($("#totalColumns").val());
+                tc = tc + 1;
+                $("#totalColumns").val(tc);
+
+                $("#Columns").append('<td></td>');
+            });
+        });
+</script>
+
 <div align="center">
-    <h2>Create Results Database Table</h2>
+    
     <input type="hidden" />
     <table>
         <thead></thead>
         <tbody>
+            <tr>
+                <td>
+                    <h2>Create Results Database Table</h2>
+                </td>
+            </tr>
             <tr>
                 <td>
                     <div class="form-group">
@@ -15,20 +32,31 @@
                         <input class="form-control" />
                     </div>
                 </td>
+            </tr>
+            <tr>
                 <td>
-                    <div class="form-group">
-                        <label class="control-label">Number of Columns</label>
+                    <h3>Columns</h3>
+                </td>
+            </tr>
+            <tr id="Columns">
+                <td>
+                    <div class="form-group" name="[0].Column">
                         <input class="form-control" />
+                        <button id="DeleteColumn" name="[0].Delete" class="btn btn-primary">Delete</button>
                     </div>
                 </td>
             </tr>
             <tr>
+                <td>
+                    <button id="AddColumn" class="btn btn-primary">Add New Column</button>
+                </td>
                 <td>
                     <div class="form-group">
                         <input type="submit" value="Create Table" class="btn btn-primary" />
                     </div>
                 </td>
             </tr>
+            <input type="hidden" id="totalColumns" value="1" />
         </tbody>
     </table>
 </div>
