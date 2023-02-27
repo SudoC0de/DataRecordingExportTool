@@ -1,0 +1,11 @@
+<database>
+    <Table>
+        TestTable
+        <Column>
+            ID
+                <Data>
+                    1
+                </Data>
+        </Column>
+    </Table>
+</database>
