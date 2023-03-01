@@ -24,8 +24,6 @@ public class RecordController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult CreateResultsTable()
     {
-
-
         return View("CreateTable");
     }
 }

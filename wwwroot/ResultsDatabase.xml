@@ -1,2 +1,9 @@
 <database>
+    <table>
+        Test1
+        <Column>
+            ID
+            <Data>1</Data>
+        </Column>
+    </table>
 </database>
