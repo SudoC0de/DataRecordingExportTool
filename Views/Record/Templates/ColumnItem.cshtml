@@ -1,0 +1,18 @@
+@model DataRecordingExportTool.Models.Table
+
+<form asp-action="Template">
+    <td>
+        <div class="form-group">
+            <input class="form-control" />
+            <input type="button" class="btn btn-primary" value="Delete" onclick="RemoveColumnDefinition(this)"/>
+        </div>
+    </td>
+
+    <td>
+        <div class="form-group">
+            <input asp-for="Columns" class="form-control" />
+            <span asp-validation-for="Columns" class="text-danger"></span>
+            <input type="button" class="btn btn-primary" value="Delete" onclick="RemoveColumnDefinition(this)"/>
+        </div>
+    </td>
+</form>

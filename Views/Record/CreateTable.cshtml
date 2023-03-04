@@ -1,12 +1,15 @@
+@model DataRecordingExportTool.Models.Table
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+
 @{
     ViewData["Title"] = "Table Creation";
 }
 
-<form method="post">
-    <div align="center">
-        <input type="hidden" />
+@Html.ValidationScripts()
+
+<div align="center">
+    <form>
         <table>
-            <thead></thead>
             <tbody>
                 <tr>
                     <td>
@@ -17,7 +20,8 @@
                     <td>
                         <div class="form-group">
                             <label class="control-label">Data Table Name</label>
-                            <input class="form-control" />
+                            <input type="text" asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                     </td>
                 </tr>
@@ -34,12 +38,11 @@
                     </td>
                     <td>
                         <div class="form-group">
-                            <input type="submit" value="Create Table" class="btn btn-primary" />
+                            <input type="submit" value="Create Result Table" class="btn btn-primary"/>
                         </div>
                     </td>
                 </tr>
             </tbody>
-            <tfoot></tfoot>
         </table>
-    </div>
-</form>
+    </form>
+</div>

@@ -12,12 +12,13 @@ function AddNewColumn() {
 
 function NewColumn() {
     return '<div class="form-group">' +
-                '<input class="form-control" />' +
-                '<button class="btn btn-primary">Delete</button>' +
+                '<input asp-for="Columns" class="form-control"/>' +
+                '<span asp-validation-for="Columns" class="text-danger"></span>' +
+                '<input type="button" class="btn btn-primary" value="Delete" onclick="RemoveColumnDefinition(this)"/>' +
            '</div>';
 }
 
 function RemoveColumnDefinition(td) {
     document.getElementById("ColumnDefinitions")
-            .removeChild(td.parentNode);
+            .removeChild(td.parentNode.parentNode);
 }
