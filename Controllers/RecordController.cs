@@ -11,10 +11,13 @@ public class RecordController : Controller
         return View();
     }
 
-    [HttpGet]
-    public IActionResult CreateTable()
+    [HttpGet, ActionName("CreateTableStep1")]
+    public IActionResult CreateTableStep1()
     {
-        return View("CreateTable");
+        // List<Column> columnsCollection = new List<Column>(0);
+
+        // return View(columnsCollection);
+        return View("CreateTableStep1");
     }
 
     [HttpGet]
@@ -23,15 +26,15 @@ public class RecordController : Controller
         return View("RecordData");
     }
 
-    [HttpPost, ActionName("CreateResultTable")]
+    [HttpPost, ActionName("GoToStep2")]
     [ValidateAntiForgeryToken]
-    public IActionResult CreateResultTable()
+    public IActionResult GoToCreateResultTableStep2([Bind("Name,NumberOfColumns")]Table table)
     {
         if (!ModelState.IsValid)
         {
-            return View("CreateTable");
+            return View("CreateTableStep1", table);
         }
 
-        return View("CreateTable");
+        return RedirectToAction("CreateTableStep2");
     }
 }

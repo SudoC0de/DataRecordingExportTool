@@ -4,15 +4,20 @@ namespace DataRecordingExportTool.Models;
 
 public class Table
 {
-    [RegularExpression(@"^[a-zA-Z0-9]*$", ErrorMessage = "(Test Validation Error) Column Name can only accpet letters and numbers!")]
-    [StringLength(1, ErrorMessage = "(Test Validation Error) Column Name cannot be more than 1 character!")]
+    [RegularExpression(@"^[a-zA-Z0-9]*$", ErrorMessage = "Table Name can only be Letters and Numbers!")]
+    [StringLength(2, MinimumLength = 1)]
+    [Display(Name = "Data Table Name")]
     [Required]
     public string Name { get; set; }
-    public List<Column> Columns { get; set; }
+
+    [Range(1,99)]
+    [RegularExpression(@"^[0-9]*$", ErrorMessage = "Number of columns can only contain Numbers!")]
+    [Display(Name = "Number of Columns")]
+    [Required]
+    public int NumberOfColumns { get; set; }
 
     public Table()
     {
         Name = string.Empty;
-        Columns = new List<Column>(0);
     }
 }
