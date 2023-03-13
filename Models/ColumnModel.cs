@@ -4,8 +4,9 @@ namespace DataRecordingExportTool.Models;
 
 public class Column
 {
-    [RegularExpression(@"^[a-zA-Z0-9]*$", ErrorMessage = "(Test Validation Error) Column Name can only accept letters and numbers!")]
-    [StringLength(1, ErrorMessage = "(Test Validation Error) Column Name cannot be more than 1 character!")]
+    [MinLength(1)]
+    [RegularExpression(@"^[a-zA-Z]+[a-zA-Z0-9_.]*$", ErrorMessage = "Column Name can only accept letters, numbers, underscores, and periods! Name can also only start with letters!")]
+    [StringLength(30, ErrorMessage = "Column Name cannot be more than 30 characters!")]
     [Required]
     public string Name { get; set; }
 

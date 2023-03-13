@@ -4,8 +4,9 @@ namespace DataRecordingExportTool.Models;
 
 public class Table
 {
+    [MinLength(1)]
     [RegularExpression(@"^[a-zA-Z0-9]*$", ErrorMessage = "Table Name can only be Letters and Numbers!")]
-    [StringLength(2, MinimumLength = 1)]
+    [StringLength(30, MinimumLength = 1)]
     [Display(Name = "Data Table Name")]
     [Required]
     public string Name { get; set; }
@@ -16,8 +17,12 @@ public class Table
     [Required]
     public int NumberOfColumns { get; set; }
 
+    public List<Column> Columns { get; set; }
+
     public Table()
     {
         Name = string.Empty;
+        NumberOfColumns = 0;
+        Columns = new List<Column>();
     }
 }

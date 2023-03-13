@@ -36,7 +36,7 @@
                 <tr>
                     <td>
                         <div class="form-group">
-                            <input type="submit" value="Create Result Table" class="btn btn-primary" />
+                            <input type="submit" value="Next" class="btn btn-primary" />
                         </div>
                     </td>
                 </tr>
@@ -44,14 +44,3 @@
         </table>
     </form>
 </div>
-
-@* @foreach (Column column in Model)
-{
-    <td>
-        <div class="form-group">
-            <input type="text" asp-for="@column.Name" class="form-control"/>
-            @Html.ValidationMessageFor(modelItem => column.Name, "", new { @class = "text-danger" })
-            <input type="button" class="btn btn-primary" value="Delete" onclick="RemoveColumnDefinition(this)"/>
-        </div>
-    </td>
-} *@

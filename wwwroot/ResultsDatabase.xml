@@ -1,9 +1,14 @@
 <database>
-    <table>
-        Test1
-        <Column>
-            ID
-            <Data>1</Data>
-        </Column>
-    </table>
+  <table name="TestTable1">
+    <header>
+      <Column name="Test" />
+      <Column name="Test2" />
+    </header>
+  </table>
+  <table name="TestTable2">
+    <header>
+      <Column name="Test3" />
+      <Column name="Test4" />
+    </header>
+  </table>
 </database>
