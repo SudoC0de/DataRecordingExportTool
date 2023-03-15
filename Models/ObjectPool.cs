@@ -4,5 +4,5 @@ namespace DataRecordingExportTool.Models;
 
 public static class ObjectPool
 {
-    public static Table CurTable = new Table();
+    public static Dictionary<string, Table> Tables = new Dictionary<string, Table>(0);
 }

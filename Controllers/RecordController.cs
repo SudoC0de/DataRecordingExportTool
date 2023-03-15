@@ -32,7 +32,7 @@ public class RecordController : Controller
     [HttpGet, ActionName("CreateTableStep2")]
     public IActionResult CreateTableStep2()
     {
-        return View("CreateTableStep2", ObjectPool.CurTable);
+        return View("CreateTableStep2", ObjectPool.Tables["TableCreate"]);
     }
 
     [HttpGet, ActionName("CreateTableStep3")]
@@ -65,35 +65,59 @@ public class RecordController : Controller
         }
 
         // Check for duplicate table names here
-
-
-        ObjectPool.CurTable.Name = table.Name;
-        ObjectPool.CurTable.NumberOfColumns = table.NumberOfColumns;
-
-        for (int i = 0; i < ObjectPool.CurTable.NumberOfColumns; i++)
+        if (DoesTableExist(table.Name))
         {
-            ObjectPool.CurTable.Columns.Add(new Column());
+            return View("CreateTableStep1", table);
         }
+        else
+        {
+            ObjectPool.Tables.Add("TableCreate", new Table()
+            {
+                Name = table.Name,
+                NumberOfColumns = table.NumberOfColumns
+            });
 
-        return RedirectToAction("CreateTableStep2");
+            for (int i = 0; i < ObjectPool.Tables["TableCreate"].NumberOfColumns; i++)
+            {
+                ObjectPool.Tables["TableCreate"]
+                          .Columns
+                          .Add(new Column());
+            }
+
+            return RedirectToAction("CreateTableStep2");
+        }
     }
 
     [HttpPost, ActionName("GoToStep3")]
     [ValidateAntiForgeryToken]
     public IActionResult GoToCreateResultTableStep3(Table table)
     {
-        //Check for duplicate columns here
         for (int i = 0; i < table.Columns.Count; i++)
         {
-            ObjectPool.CurTable.Columns[i].Name = table.Columns[i].Name;
+            ObjectPool.Tables["TableCreate"]
+                      .Columns[i]
+                      .Name = table.Columns[i]
+                                   .Name;
         }
 
-        AddTableToXmlDb();
-        ObjectPool.CurTable = new Table();
+        //Check for duplicate columns here
+        if (DoDuplicateColumnsExist(ObjectPool.Tables["TableCreate"].Columns))
+        {
+            return RedirectToAction("CreateTableStep2");
+        }
+        else
+        {
+            AddTableToXmlDb();
+            ObjectPool.Tables["TableCreate"] = new Table();
+            ObjectPool.Tables.Remove("TableCreate");
 
-        return RedirectToAction("CreateTableStep3");
+            return RedirectToAction("CreateTableStep3");
+        }
     }
 
+    #endregion
+
+    #region Helpers
     private void AddTableToXmlDb()
     {
         string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
@@ -108,16 +132,16 @@ public class RecordController : Controller
             XmlElement tableElement = xml.CreateElement("table");
             XmlAttribute nameAttri = xml.CreateAttribute("name");
 
-            nameAttri.Value = ObjectPool.CurTable.Name;
+            nameAttri.Value = ObjectPool.Tables["TableCreate"].Name;
             tableElement.Attributes.Append(nameAttri);
 
             XmlElement headerRowElement = xml.CreateElement("header");
-            
-            foreach (Column column in ObjectPool.CurTable.Columns)
+
+            foreach (Column column in ObjectPool.Tables["TableCreate"].Columns)
             {
                 XmlElement columnElement = xml.CreateElement("Column");
                 XmlAttribute columnName = xml.CreateAttribute("name");
-                
+
                 columnName.Value = column.Name;
                 columnElement.Attributes.Append(columnName);
                 headerRowElement.AppendChild(columnElement);
@@ -126,9 +150,60 @@ public class RecordController : Controller
             tableElement.AppendChild(headerRowElement);
             rooteNode.AppendChild(tableElement);
             xml.Save(databasePath);
-        }  
+        }
+    }
+
+    private bool DoesTableExist(string tableName)
+    {
+        string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
+        XmlDocument xml = new XmlDocument();
+
+        xml.Load(databasePath);
+
+        XmlNode rooteNode = xml.DocumentElement;
+
+        if (rooteNode != null)
+        {
+            XmlNode? node = rooteNode.SelectSingleNode($"//database/table[@name='{tableName}']");
+
+            if (node != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private bool DoDuplicateColumnsExist(List<Column> columns)
+    {
+        List<string> columnNames = new List<string>(0);
+
+        foreach (Column column in columns)
+        {
+            columnNames.Add(column.Name);
+        }
+
+        foreach (Column column in columns)
+        {
+            int nameCount = columnNames.Where(name => name == column.Name)
+                                       .Count();
+
+            if (nameCount > 1)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
     #endregion
-    
+
     #endregion
 }

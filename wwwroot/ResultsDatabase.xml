@@ -1,14 +1,22 @@
 <database>
-  <table name="TestTable1">
+  <table name="DataTableTest">
     <header>
-      <Column name="Test" />
+      <Column name="Test1" />
+      <Column name="Test2" />
+      <Column name="Test3" />
+    </header>
+  </table>
+  <table name="DataTableTest2">
+    <header>
+      <Column name="Test1" />
       <Column name="Test2" />
     </header>
   </table>
-  <table name="TestTable2">
+  <table name="DataTableTest3">
     <header>
+      <Column name="Test1" />
+      <Column name="Test2" />
       <Column name="Test3" />
-      <Column name="Test4" />
     </header>
   </table>
 </database>
