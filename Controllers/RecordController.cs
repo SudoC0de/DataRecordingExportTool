@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using DataRecordingExportTool.Models;
 using System.Xml;
-using System.Xml.XPath;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DataRecordingExportTool.Controllers;
 
@@ -17,6 +17,12 @@ public class RecordController : Controller
     // GET: /Record/
     public IActionResult Index()
     {
+        if (ObjectPool.Databases.ContainsKey("DeleteTable"))
+        {
+            ObjectPool.Databases["DeleteTable"] = new DatabaseViewModel();
+            ObjectPool.Databases.Remove("DeleteTable");
+        }
+        
         return View("RecordShortcuts");
     }
 
@@ -41,12 +47,34 @@ public class RecordController : Controller
         return View("RecordShortcuts");
     }
     #endregion
-    
+
+    #region Delete Table
+    [HttpGet, ActionName("DeleteTableStep1")]
+    public IActionResult DeleteTableStep1()
+    {
+        if (ObjectPool.Databases.ContainsKey("DeleteTable") == false)
+        {
+            ObjectPool.Databases.Add("DeleteTable", new DatabaseViewModel
+                                                    {
+                                                        TableNames = new SelectList(GetTableNames())
+                                                    });
+        }
+
+        return View("DeleteTableStep1", ObjectPool.Databases["DeleteTable"]);
+    }
+
+    [HttpGet, ActionName("DeleteTableStep2")]
+    public IActionResult DeleteTableStep2()
+    {
+        return View("RecordShortcuts");
+    }
+    #endregion
+
     #region Record Data Points
-    [HttpGet]
+    [HttpGet, ActionName("RecordDataStep1")]
     public IActionResult RecordData()
     {
-        return View("RecordData");
+        return View("RecordDataStep1");
     }
     #endregion
     
@@ -64,7 +92,6 @@ public class RecordController : Controller
             return View("CreateTableStep1", table);
         }
 
-        // Check for duplicate table names here
         if (DoesTableExist(table.Name))
         {
             return View("CreateTableStep1", table);
@@ -100,7 +127,6 @@ public class RecordController : Controller
                                    .Name;
         }
 
-        //Check for duplicate columns here
         if (DoDuplicateColumnsExist(ObjectPool.Tables["TableCreate"].Columns))
         {
             return RedirectToAction("CreateTableStep2");
@@ -114,7 +140,23 @@ public class RecordController : Controller
             return RedirectToAction("CreateTableStep3");
         }
     }
+    #endregion
 
+    #region Delete Table
+    [HttpPost, ActionName("DeleteTableGoToStep2")]
+    [ValidateAntiForgeryToken]
+    public IActionResult GoToDeleteResultTableStep2(DatabaseViewModel dbVM)
+    {
+        if (DeleteTable(dbVM.TableName))
+        {
+            ObjectPool.Databases["DeleteTable"] = new DatabaseViewModel();
+            ObjectPool.Databases.Remove("DeleteTable");
+
+            return RedirectToAction("DeleteTableStep2");
+        }
+
+        return RedirectToAction("DeleteTableStep1");
+    }
     #endregion
 
     #region Helpers
@@ -199,6 +241,52 @@ public class RecordController : Controller
             {
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    private List<string> GetTableNames()
+    {
+        string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
+        XmlDocument xml = new XmlDocument();
+
+        xml.Load(databasePath);
+
+        XmlNodeList? nodes = xml.DocumentElement
+                                .SelectNodes($"//database/table");
+
+        if (nodes != null)
+        {
+            var tableNames = new List<string>(0);
+
+            foreach (XmlNode node in nodes)
+            {
+                tableNames.Add(node.Attributes["name"].Value);
+            }
+
+            return tableNames;
+        }
+
+        return new List<string>(0);
+    }
+
+    private bool DeleteTable(string tableName)
+    {
+        string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
+        XmlDocument xml = new XmlDocument();
+
+        xml.Load(databasePath);
+
+        XmlNode? node = xml.DocumentElement
+                           .SelectSingleNode($"//database/table[@name='{tableName}']");
+
+        if (node != null)
+        {
+            xml.DocumentElement.RemoveChild(node);
+            xml.Save(databasePath);
+
+            return true;
         }
 
         return false;

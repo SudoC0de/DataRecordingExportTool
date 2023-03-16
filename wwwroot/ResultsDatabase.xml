@@ -10,12 +10,6 @@
     <header>
       <Column name="Test1" />
       <Column name="Test2" />
-    </header>
-  </table>
-  <table name="DataTableTest3">
-    <header>
-      <Column name="Test1" />
-      <Column name="Test2" />
       <Column name="Test3" />
     </header>
   </table>
