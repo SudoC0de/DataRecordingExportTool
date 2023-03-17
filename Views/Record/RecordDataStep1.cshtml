@@ -1,5 +1,39 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model DataRecordingExportTool.Models.ModifyTableViewModel
+
 @{
-    ViewData["Title"] = "Record Data";
+    ViewData["Title"] = "Modify Data";
 }
 
-<h2>Entering In Data Goes Here</h2>
+<div align="center">
+    <table>
+        <tr>
+            <td align="center">Modify Data Table</td>
+        </tr>
+        <form asp-action="ModifyTableGoToStep2">
+            <tr>
+                <td>
+                    <label>Table</label>
+                </td>
+                <td>
+                    <select asp-for="TableName" asp-items="Model.TableNames"></select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Task</label>
+                </td>
+                <td>
+                    <select asp-for="TableTask" asp-items="Model.TableTasks"></select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="form-group">
+                        <input type="submit" value="Next" class="btn btn-primary" />
+                    </div>
+                </td>
+            </tr>
+        </form>
+    </table>
+</div>

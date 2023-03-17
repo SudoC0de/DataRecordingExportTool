@@ -14,7 +14,8 @@ public class RecordController : Controller
         _webEnvironmentRootDirectory = environment.WebRootPath;
     }
 
-    // GET: /Record/
+    #region HttpGet
+
     public IActionResult Index()
     {
         if (ObjectPool.Databases.ContainsKey("DeleteTable"))
@@ -22,11 +23,14 @@ public class RecordController : Controller
             ObjectPool.Databases["DeleteTable"] = new DatabaseViewModel();
             ObjectPool.Databases.Remove("DeleteTable");
         }
-        
+
+        if (ObjectPool.Tables.ContainsKey("TableCreate"))
+        {
+            ObjectPool.Tables["TableCreate"] = new Table();
+        }
+
         return View("RecordShortcuts");
     }
-
-    #region HttpGet
 
     #region Create Table
     [HttpGet, ActionName("CreateTableStep1")]
@@ -74,7 +78,26 @@ public class RecordController : Controller
     [HttpGet, ActionName("RecordDataStep1")]
     public IActionResult RecordData()
     {
-        return View("RecordDataStep1");
+        if (ObjectPool.TableModifications.ContainsKey("ModifyTable") == false)
+        {
+            ObjectPool.TableModifications.Add("ModifyTable", new ModifyTableViewModel
+                                                             {
+                                                                 TableNames = new SelectList(GetTableNames()),
+                                                                 TableTasks = new SelectList(new List<string>(2)
+                                                                 {
+                                                                     "Add Data Point",
+                                                                     "Delete Table Column"
+                                                                 })
+                                                             });
+        }
+
+        return View("RecordDataStep1", ObjectPool.TableModifications["ModifyTable"]);
+    }
+
+    [HttpGet, ActionName("AddDataPointStep1")]
+    public IActionResult AddDataPointStep1()
+    {
+        return View("RecordShortcuts");
     }
     #endregion
     
@@ -157,6 +180,36 @@ public class RecordController : Controller
 
         return RedirectToAction("DeleteTableStep1");
     }
+    #endregion
+
+    #region Modify Table
+    [HttpPost, ActionName("ModifyTableGoToStep2")]
+    [ValidateAntiForgeryToken]
+    public IActionResult GoToModifyResultTableStep2(ModifyTableViewModel mTVM)
+    {
+        ObjectPool.Tables.Add("Modify", new Table()
+        {
+            Name = mTVM.TableName,
+            NumberOfColumns = GetNumTableColumns(mTVM.TableName),
+            Columns = GetColumns(mTVM.TableName)
+        });
+
+        switch (mTVM.TableTask)
+        {
+            case "Add Data Point":
+                {
+                    break;
+                }
+            case "Delete Table Column":
+                {
+                    break;
+                }
+        }
+
+        return RedirectToAction("AddDataPointStep1");
+    }
+    #endregion
+
     #endregion
 
     #region Helpers
@@ -291,7 +344,40 @@ public class RecordController : Controller
 
         return false;
     }
-    #endregion
 
+    private int GetNumTableColumns(string tableName)
+    {
+        string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
+        XmlDocument xml = new XmlDocument();
+
+        xml.Load(databasePath);
+
+        return xml.DocumentElement
+                  .SelectNodes($"//database/table[@name='{tableName}']/header/Column")
+                  .Count;
+    }
+
+    private List<Column> GetColumns(string tableName)
+    {
+        string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
+        XmlDocument xml = new XmlDocument();
+
+        xml.Load(databasePath);
+
+        XmlNodeList? nodes = xml.DocumentElement
+                                .SelectNodes($"//database/table[@name='{tableName}']/header/Column");
+
+        List<Column> columns = new List<Column>(0);
+
+        foreach(XmlNode column in nodes)
+        {
+            columns.Add(new Column()
+            {
+                Name = column.Attributes["name"].Value
+            });
+        }
+
+        return columns;
+    }
     #endregion
 }
