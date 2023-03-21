@@ -1,5 +1,5 @@
 @using Microsoft.AspNetCore.Mvc.Rendering
-@model DataRecordingExportTool.Models.ModifyTableViewModel
+@model DataRecordingExportTool.Models.ModifyDataStep1ViewModel
 
 @{
     ViewData["Title"] = "Modify Data";
@@ -8,7 +8,7 @@
 <div align="center">
     <table>
         <tr>
-            <td align="center">Modify Data Table</td>
+            <td>Modify Data Table</td>
         </tr>
         <form asp-action="ModifyTableGoToStep2">
             <tr>
@@ -16,7 +16,7 @@
                     <label>Table</label>
                 </td>
                 <td>
-                    <select asp-for="TableName" asp-items="Model.TableNames"></select>
+                    <select asp-for="@Model.TableName" asp-items="@Model.TableNames"></select>
                 </td>
             </tr>
             <tr>
@@ -24,7 +24,7 @@
                     <label>Task</label>
                 </td>
                 <td>
-                    <select asp-for="TableTask" asp-items="Model.TableTasks"></select>
+                    <select asp-for="@Model.TableTask" asp-items="@Model.TableTasks"></select>
                 </td>
             </tr>
             <tr>

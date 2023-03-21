@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using DataRecordingExportTool.Models;
 using System.Xml;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Diagnostics.Eventing.Reader;
+using System.ComponentModel.Design.Serialization;
 
 namespace DataRecordingExportTool.Controllers;
 
@@ -18,10 +20,25 @@ public class RecordController : Controller
 
     public IActionResult Index()
     {
-        if (ObjectPool.Databases.ContainsKey("DeleteTable"))
+        if (ObjectPool.DeleteViewModel != null)
         {
-            ObjectPool.Databases["DeleteTable"] = new DatabaseViewModel();
-            ObjectPool.Databases.Remove("DeleteTable");
+            ObjectPool.DeleteViewModel.TableName = null;
+            ObjectPool.DeleteViewModel.TableNames = null;
+            ObjectPool.DeleteViewModel = null;
+        }
+        else if (ObjectPool.ModifyDataStep1ViewModel != null)
+        {
+            ObjectPool.ModifyDataStep1ViewModel.TableName = null;
+            ObjectPool.ModifyDataStep1ViewModel.TableNames = null;
+            ObjectPool.ModifyDataStep1ViewModel.TableTask = null;
+            ObjectPool.ModifyDataStep1ViewModel.TableTasks = null;
+            ObjectPool.ModifyDataStep1ViewModel = null;
+        }
+        else if (ObjectPool.AddDataStep1ViewModel != null)
+        {
+            ObjectPool.AddDataStep1ViewModel.TableName = null;
+            ObjectPool.AddDataStep1ViewModel.Row = null;
+            ObjectPool.AddDataStep1ViewModel = null;
         }
 
         if (ObjectPool.Tables.ContainsKey("TableCreate"))
@@ -56,15 +73,15 @@ public class RecordController : Controller
     [HttpGet, ActionName("DeleteTableStep1")]
     public IActionResult DeleteTableStep1()
     {
-        if (ObjectPool.Databases.ContainsKey("DeleteTable") == false)
+        if (ObjectPool.DeleteViewModel == null)
         {
-            ObjectPool.Databases.Add("DeleteTable", new DatabaseViewModel
-                                                    {
-                                                        TableNames = new SelectList(GetTableNames())
-                                                    });
+            ObjectPool.DeleteViewModel = new DeleteViewModel
+            {
+                TableNames = new SelectList(GetTableNames())
+            };
         }
 
-        return View("DeleteTableStep1", ObjectPool.Databases["DeleteTable"]);
+        return View("DeleteTableStep1", ObjectPool.DeleteViewModel);
     }
 
     [HttpGet, ActionName("DeleteTableStep2")]
@@ -74,33 +91,51 @@ public class RecordController : Controller
     }
     #endregion
 
-    #region Record Data Points
-    [HttpGet, ActionName("RecordDataStep1")]
-    public IActionResult RecordData()
+    #region Modify Table
+    [HttpGet, ActionName("ModifyDataStep1")]
+    public IActionResult ModifyDataStep1()
     {
-        if (ObjectPool.TableModifications.ContainsKey("ModifyTable") == false)
+        if (ObjectPool.ModifyDataStep1ViewModel ==  null)
         {
-            ObjectPool.TableModifications.Add("ModifyTable", new ModifyTableViewModel
-                                                             {
-                                                                 TableNames = new SelectList(GetTableNames()),
-                                                                 TableTasks = new SelectList(new List<string>(2)
-                                                                 {
-                                                                     "Add Data Point",
-                                                                     "Delete Table Column"
-                                                                 })
-                                                             });
-        }
+            ObjectPool.ModifyDataStep1ViewModel = new ModifyDataStep1ViewModel()
+            {
+                TableNames = new SelectList(GetTableNames()),
+                TableTasks = new SelectList(new List<string>(2)
+                                            {
+                                                "Add Data Point",
+                                                "Delete Table Column"
+                                            })
+            };
+        }                                                     
 
-        return View("RecordDataStep1", ObjectPool.TableModifications["ModifyTable"]);
+        return View("ModifyDataStep1", ObjectPool.ModifyDataStep1ViewModel);
     }
 
     [HttpGet, ActionName("AddDataPointStep1")]
     public IActionResult AddDataPointStep1()
     {
+        return View("AddDataStep1", ObjectPool.AddDataStep1ViewModel);
+    }
+
+    [HttpGet, ActionName("AddDataPointStep2")]
+    public IActionResult AddDataPointStep2()
+    {
+        return View("RecordShortcuts");
+    }
+
+    [HttpGet, ActionName("DeleteColumnStep1")]
+    public IActionResult DeleteColumnStep1()
+    {
+        return View("DeleteColumnStep1", ObjectPool.DeleteColumnStep1ViewModel);
+    }
+
+    [HttpGet, ActionName("DeleteColumnStep2")]
+    public IActionResult DeleteColumnStep2()
+    {
         return View("RecordShortcuts");
     }
     #endregion
-    
+
     #endregion
 
     #region HttpPost
@@ -168,13 +203,10 @@ public class RecordController : Controller
     #region Delete Table
     [HttpPost, ActionName("DeleteTableGoToStep2")]
     [ValidateAntiForgeryToken]
-    public IActionResult GoToDeleteResultTableStep2(DatabaseViewModel dbVM)
+    public IActionResult GoToDeleteResultTableStep2(DeleteViewModel dbVM)
     {
         if (DeleteTable(dbVM.TableName))
         {
-            ObjectPool.Databases["DeleteTable"] = new DatabaseViewModel();
-            ObjectPool.Databases.Remove("DeleteTable");
-
             return RedirectToAction("DeleteTableStep2");
         }
 
@@ -185,28 +217,79 @@ public class RecordController : Controller
     #region Modify Table
     [HttpPost, ActionName("ModifyTableGoToStep2")]
     [ValidateAntiForgeryToken]
-    public IActionResult GoToModifyResultTableStep2(ModifyTableViewModel mTVM)
+    public IActionResult GoToModifyResultTableStep2(ModifyDataStep1ViewModel mTVM)
     {
-        ObjectPool.Tables.Add("Modify", new Table()
-        {
-            Name = mTVM.TableName,
-            NumberOfColumns = GetNumTableColumns(mTVM.TableName),
-            Columns = GetColumns(mTVM.TableName)
-        });
-
         switch (mTVM.TableTask)
         {
             case "Add Data Point":
                 {
-                    break;
+                    Row curRow = new Row()
+                    {
+                        Columns = GetColumns(mTVM.TableName)
+                    };
+
+                    for (int i = 0; i < curRow.Columns.Count; i++)
+                    {
+                        curRow.DataPoints.Add(new DataPoint());
+                    }
+
+                    ObjectPool.AddDataStep1ViewModel = new AddDataStep1ViewModel()
+                    {
+                        TableName = mTVM.TableName,
+                        Row = curRow
+                    };
+
+                    return RedirectToAction("AddDataPointStep1");
                 }
             case "Delete Table Column":
                 {
-                    break;
+                    ObjectPool.DeleteColumnStep1ViewModel = new DeleteColumnStep1ViewModel()
+                    {
+                        TableName = mTVM.TableName,
+                        ColumnNames = new SelectList(GetColumnNames(mTVM.TableName))
+                    };
+
+                    return RedirectToAction("DeleteColumnStep1");
                 }
+            default:
+                {
+                    return RedirectToAction("ModifyDataStep1");
+                }
+        }
+    }
+
+    [HttpPost, ActionName("AddDataPoints")]
+    [ValidateAntiForgeryToken]
+    public IActionResult AddDataPoints(AddDataStep1ViewModel mTVM)
+    {
+        if (ModelState.IsValid)
+        {
+            for (int i = 0; i < mTVM.Row.DataPoints.Count; i++)
+            {
+                ObjectPool.AddDataStep1ViewModel.Row.DataPoints[i].Data = mTVM.Row.DataPoints[i].Data;
+            }
+
+            AddRowToXmlDb();
+
+            return RedirectToAction("AddDataPointStep2");
         }
 
         return RedirectToAction("AddDataPointStep1");
+    }
+
+    [HttpPost, ActionName("DeleteTableColumn")]
+    [ValidateAntiForgeryToken]
+    public IActionResult DeleteTableColumn(DeleteColumnStep1ViewModel mTVM)
+    {
+        if (ModelState.IsValid)
+        {
+            ObjectPool.DeleteColumnStep1ViewModel.ColumnName = mTVM.ColumnName;
+            DeleteColumnFromXmlDb();
+
+            return RedirectToAction("DeleteColumnStep2");
+        }
+
+        return RedirectToAction("DeleteColumnStep1");
     }
     #endregion
 
@@ -246,6 +329,82 @@ public class RecordController : Controller
             rooteNode.AppendChild(tableElement);
             xml.Save(databasePath);
         }
+    }
+
+    private void AddRowToXmlDb()
+    {
+        string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
+        XmlDocument xml = new XmlDocument();
+
+        xml.Load(databasePath);
+
+        XmlElement rowElement = xml.CreateElement("Row");
+        XmlAttribute idAttri = xml.CreateAttribute("id");
+
+        idAttri.Value = (GetNumTableRows(ObjectPool.AddDataStep1ViewModel.TableName) + 1).ToString();
+        rowElement.Attributes.Append(idAttri);
+
+        for (int i = 0; i < ObjectPool.AddDataStep1ViewModel.Row.DataPoints.Count; i++)
+        {
+            XmlElement dataPoint = xml.CreateElement("DataPoint");
+            XmlAttribute name = xml.CreateAttribute("name");
+            XmlAttribute data = xml.CreateAttribute("data");
+
+            name.Value = ObjectPool.AddDataStep1ViewModel.Row.Columns[i].Name;
+            data.Value = ObjectPool.AddDataStep1ViewModel.Row.DataPoints[i].Data;
+            dataPoint.Attributes.Append(name);
+            dataPoint.Attributes.Append(data);
+            rowElement.AppendChild(dataPoint);
+        }
+
+        xml.DocumentElement
+           .SelectSingleNode($"//database/table[@name='{ObjectPool.AddDataStep1ViewModel.TableName}']")
+           .AppendChild(rowElement);
+        xml.Save(databasePath);
+    }
+
+    private void DeleteColumnFromXmlDb()
+    {
+        string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
+        XmlDocument xml = new XmlDocument();
+
+        xml.Load(databasePath);
+
+        XmlNodeList? nodes = xml.DocumentElement
+                                .SelectNodes($"//database/table[@name='{ObjectPool.DeleteColumnStep1ViewModel.TableName}']/header/Column");
+        
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            if (string.Equals(nodes[i].Attributes["name"].Value, ObjectPool.DeleteColumnStep1ViewModel.ColumnName))
+            {
+                xml.DocumentElement
+                   .SelectSingleNode($"//database/table[@name='{ObjectPool.DeleteColumnStep1ViewModel.TableName}']/header")
+                   .RemoveChild(nodes[i]);
+                break;
+            }
+        }
+
+        nodes = xml.DocumentElement
+                   .SelectNodes($"//database/table[@name='{ObjectPool.DeleteColumnStep1ViewModel.TableName}']/Row");
+
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            XmlNodeList? dataPoints = xml.DocumentElement
+                                         .SelectNodes($"//database/table[@name='{ObjectPool.DeleteColumnStep1ViewModel.TableName}']/Row[@id='{i + 1}']/DataPoint");
+
+            for (int i2 = 0; i2 < dataPoints.Count; i2++)
+            {
+                if (string.Equals(dataPoints[i2].Attributes["name"].Value, ObjectPool.DeleteColumnStep1ViewModel.ColumnName))
+                {
+                    xml.DocumentElement
+                       .SelectSingleNode($"//database/table[@name='{ObjectPool.DeleteColumnStep1ViewModel.TableName}']/Row[@id='{i + 1}']")
+                       .RemoveChild(dataPoints[i2]);
+                    break;
+                }
+            }
+        }
+
+        xml.Save(databasePath);
     }
 
     private bool DoesTableExist(string tableName)
@@ -324,6 +483,25 @@ public class RecordController : Controller
         return new List<string>(0);
     }
 
+    private List <string> GetColumnNames(string tableName)
+    {
+        string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
+        XmlDocument xml = new XmlDocument();
+
+        xml.Load(databasePath);
+
+        XmlNodeList? nodes = xml.DocumentElement
+                                .SelectNodes($"//database/table[@name='{tableName}']/header/Column");
+        List<string> columnNames = new List<string>(0);
+
+        foreach(XmlNode column in nodes)
+        {
+            columnNames.Add(column.Attributes["name"].Value);
+        }
+
+        return columnNames;
+    }
+
     private bool DeleteTable(string tableName)
     {
         string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
@@ -345,7 +523,7 @@ public class RecordController : Controller
         return false;
     }
 
-    private int GetNumTableColumns(string tableName)
+    private int GetNumTableRows(string tableName)
     {
         string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
         XmlDocument xml = new XmlDocument();
@@ -353,7 +531,7 @@ public class RecordController : Controller
         xml.Load(databasePath);
 
         return xml.DocumentElement
-                  .SelectNodes($"//database/table[@name='{tableName}']/header/Column")
+                  .SelectNodes($"//database/table[@name='{tableName}']/Row")
                   .Count;
     }
 
