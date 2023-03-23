@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using DataRecordingExportTool.Models;
+using DataRecordingExportTool.Models.ViewModels;
 
 namespace DataRecordingExportTool.Controllers;
 

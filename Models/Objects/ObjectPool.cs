@@ -1,4 +1,6 @@
-namespace DataRecordingExportTool.Models;
+using DataRecordingExportTool.Models.ViewModels;
+
+namespace DataRecordingExportTool.Models.Objects;
 
 public static class ObjectPool
 {
@@ -7,4 +9,6 @@ public static class ObjectPool
     public static ModifyDataStep1ViewModel? ModifyDataStep1ViewModel { get; set; } = null;
     public static AddDataStep1ViewModel? AddDataStep1ViewModel { get; set; } = null;
     public static DeleteColumnStep1ViewModel? DeleteColumnStep1ViewModel { get; set; } = null;
+    public static DisplayTableStep1ViewModel? DisplayTableStep1ViewModel { get; set; } = null;
+    public static DisplayTableStep2ViewModel? DisplayTableStep2ViewModel { get; set; } = null;
 }

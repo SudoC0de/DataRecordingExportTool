@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using DataRecordingExportTool.Models;
 using System.Xml;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Diagnostics.Eventing.Reader;
 using System.ComponentModel.Design.Serialization;
+using DataRecordingExportTool.Models.ViewModels;
+using DataRecordingExportTool.Models.Objects;
 
 namespace DataRecordingExportTool.Controllers;
 
@@ -22,23 +23,23 @@ public class RecordController : Controller
     {
         if (ObjectPool.DeleteViewModel != null)
         {
-            ObjectPool.DeleteViewModel.TableName = null;
-            ObjectPool.DeleteViewModel.TableNames = null;
             ObjectPool.DeleteViewModel = null;
         }
         else if (ObjectPool.ModifyDataStep1ViewModel != null)
         {
-            ObjectPool.ModifyDataStep1ViewModel.TableName = null;
-            ObjectPool.ModifyDataStep1ViewModel.TableNames = null;
-            ObjectPool.ModifyDataStep1ViewModel.TableTask = null;
-            ObjectPool.ModifyDataStep1ViewModel.TableTasks = null;
             ObjectPool.ModifyDataStep1ViewModel = null;
         }
         else if (ObjectPool.AddDataStep1ViewModel != null)
         {
-            ObjectPool.AddDataStep1ViewModel.TableName = null;
-            ObjectPool.AddDataStep1ViewModel.Row = null;
             ObjectPool.AddDataStep1ViewModel = null;
+        }
+        else if (ObjectPool.DisplayTableStep1ViewModel != null)
+        {
+            ObjectPool.DisplayTableStep1ViewModel = null;
+        }
+        else if (ObjectPool.DisplayTableStep2ViewModel != null)
+        {
+            ObjectPool.DisplayTableStep2ViewModel = null;
         }
 
         if (ObjectPool.Tables.ContainsKey("TableCreate"))
@@ -131,6 +132,34 @@ public class RecordController : Controller
 
     [HttpGet, ActionName("DeleteColumnStep2")]
     public IActionResult DeleteColumnStep2()
+    {
+        return View("RecordShortcuts");
+    }
+    #endregion
+
+    #region Display Table
+    [HttpGet, ActionName("DisplayTableStep1")]
+    public IActionResult DisplayTableStep1()
+    {
+        if (ObjectPool.DisplayTableStep1ViewModel == null)
+        {
+            ObjectPool.DisplayTableStep1ViewModel = new DisplayTableStep1ViewModel()
+            {
+                TableNames = new SelectList(GetTableNames())
+            };
+        }
+
+        return View("DisplayTableStep1", ObjectPool.DisplayTableStep1ViewModel);
+    }
+
+    [HttpGet, ActionName("DisplayTableStep2")]
+    public IActionResult DisplayTableStep2()
+    {
+        return View("DisplayTableStep2", ObjectPool.DisplayTableStep2ViewModel);
+    }
+
+    [HttpGet, ActionName("DisplayTableStep3")]
+    public IActionResult DisplayTableStep3()
     {
         return View("RecordShortcuts");
     }
@@ -290,6 +319,38 @@ public class RecordController : Controller
         }
 
         return RedirectToAction("DeleteColumnStep1");
+    }
+    #endregion
+
+    #region Display Table
+    [HttpPost, ActionName("DisplayTableGoToToStep2")]
+    [ValidateAntiForgeryToken]
+    public IActionResult GoToDisplayTableStep2(DisplayTableStep1ViewModel dTVM)
+    {
+        if (ModelState.IsValid)
+        {
+            ObjectPool.DisplayTableStep2ViewModel = new DisplayTableStep2ViewModel()
+            {
+                Table = new Table()
+                {
+                    Name = dTVM.TableName,
+                    NumberOfColumns = GetColumnNames(dTVM.TableName).Count,
+                    Columns = GetColumns(dTVM.TableName)
+                },
+                Rows = GetTableRows(dTVM.TableName)
+            };
+
+            return RedirectToAction("DisplayTableStep2");
+        }
+
+        return RedirectToAction("DisplayTableStep1");
+    }
+
+    [HttpPost, ActionName("DisplayTableGoToStep3")]
+    [ValidateAntiForgeryToken]
+    public IActionResult GoToDisplayTableStep3()
+    {
+        return RedirectToAction("DisplayTableStep3");
     }
     #endregion
 
@@ -544,7 +605,6 @@ public class RecordController : Controller
 
         XmlNodeList? nodes = xml.DocumentElement
                                 .SelectNodes($"//database/table[@name='{tableName}']/header/Column");
-
         List<Column> columns = new List<Column>(0);
 
         foreach(XmlNode column in nodes)
@@ -556,6 +616,52 @@ public class RecordController : Controller
         }
 
         return columns;
+    }
+
+    private List<Row> GetTableRows(string tableName)
+    {
+        string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
+        XmlDocument xml = new XmlDocument();
+
+        xml.Load(databasePath);
+
+        XmlNodeList? rows = xml.DocumentElement
+                               .SelectNodes($"//database/table[@name='{tableName}']/Row");
+        List<Row> tableRows = new List<Row>(0);
+
+        foreach (XmlNode row in rows)
+        {
+            tableRows.Add(new Row()
+            {
+                Id = int.Parse(row.Attributes["id"].Value),
+                Columns = GetColumns(tableName),
+                DataPoints = GetRowDataPoints(tableName, int.Parse(row.Attributes["id"].Value))
+            });
+        }
+
+        return tableRows;
+    }
+
+    private List<DataPoint> GetRowDataPoints(string tableName, int rowId)
+    {
+        string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
+        XmlDocument xml = new XmlDocument();
+
+        xml.Load(databasePath);
+
+        XmlNodeList? documentDataPoints = xml.DocumentElement
+                                             .SelectNodes($"//database/table[@name='{tableName}']/Row[@id='{rowId}']/DataPoint");
+        List<DataPoint> dataPoints = new List<DataPoint>(0);
+
+        foreach (XmlNode documentDataPoint in documentDataPoints)
+        {
+            dataPoints.Add(new DataPoint()
+            {
+                Data = documentDataPoint.Attributes["data"].Value
+            });
+        }
+
+        return dataPoints;
     }
     #endregion
 }

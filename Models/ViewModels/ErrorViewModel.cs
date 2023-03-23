@@ -1,4 +1,4 @@
-namespace DataRecordingExportTool.Models;
+namespace DataRecordingExportTool.Models.ViewModels;
 
 public class ErrorViewModel
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace DataRecordingExportTool.Models
+namespace DataRecordingExportTool.Models.ViewModels
 {
     public class DeleteColumnStep1ViewModel
     {

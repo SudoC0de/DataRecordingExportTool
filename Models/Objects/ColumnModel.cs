@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace DataRecordingExportTool.Models;
+namespace DataRecordingExportTool.Models.Objects;
 
 public class Column
 {

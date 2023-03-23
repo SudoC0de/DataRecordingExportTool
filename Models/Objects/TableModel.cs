@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace DataRecordingExportTool.Models;
+namespace DataRecordingExportTool.Models.Objects;
 
 public class Table
 {
@@ -11,7 +11,7 @@ public class Table
     [Required]
     public string Name { get; set; }
 
-    [Range(1,99)]
+    [Range(1, 99)]
     [RegularExpression(@"^[0-9]*$", ErrorMessage = "Number of columns can only contain Numbers!")]
     [Display(Name = "Number of Columns")]
     [Required]

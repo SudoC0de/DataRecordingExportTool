@@ -1,4 +1,6 @@
-﻿namespace DataRecordingExportTool.Models
+﻿using DataRecordingExportTool.Models.Objects;
+
+namespace DataRecordingExportTool.Models.ViewModels
 {
     public class AddDataStep1ViewModel
     {

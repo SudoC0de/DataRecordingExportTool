@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace DataRecordingExportTool.Models
+namespace DataRecordingExportTool.Models.ViewModels
 {
-    public class DeleteViewModel
+    public class DisplayTableStep1ViewModel
     {
         public string? TableName { get; set; }
         public SelectList? TableNames { get; set; }
