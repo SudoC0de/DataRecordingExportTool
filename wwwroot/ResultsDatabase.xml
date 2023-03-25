@@ -22,10 +22,6 @@
       <DataPoint name="Test1" data="1.3" />
       <DataPoint name="Test3" data="9001" />
     </Row>
-    <Row id="2">
-      <DataPoint name="Test1" data="967" />
-      <DataPoint name="Test3" data="09" />
-    </Row>
   </table>
   <table name="DataTableTest4">
     <header>

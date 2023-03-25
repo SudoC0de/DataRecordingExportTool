@@ -25,21 +25,26 @@ public class RecordController : Controller
         {
             ObjectPool.DeleteViewModel = null;
         }
-        else if (ObjectPool.ModifyDataStep1ViewModel != null)
+        if (ObjectPool.ModifyDataStep1ViewModel != null)
         {
             ObjectPool.ModifyDataStep1ViewModel = null;
         }
-        else if (ObjectPool.AddDataStep1ViewModel != null)
+        if (ObjectPool.AddDataStep1ViewModel != null)
         {
             ObjectPool.AddDataStep1ViewModel = null;
         }
-        else if (ObjectPool.DisplayTableStep1ViewModel != null)
+        if (ObjectPool.DisplayTableStep1ViewModel != null)
         {
             ObjectPool.DisplayTableStep1ViewModel = null;
         }
-        else if (ObjectPool.DisplayTableStep2ViewModel != null)
+        if (ObjectPool.DisplayTableStep2ViewModel != null)
         {
             ObjectPool.DisplayTableStep2ViewModel = null;
+        }
+        if (ObjectPool.RemoveDataRowStep1ViewModel != null)
+        {
+            ObjectPool.RemoveDataRowStep1ViewModel.Cleanup();
+            ObjectPool.RemoveDataRowStep1ViewModel = null;
         }
 
         if (ObjectPool.Tables.ContainsKey("TableCreate"))
@@ -103,8 +108,10 @@ public class RecordController : Controller
                 TableNames = new SelectList(GetTableNames()),
                 TableTasks = new SelectList(new List<string>(2)
                                             {
-                                                "Add Data Point",
-                                                "Delete Table Column"
+                                                "Add Data Row",
+                                                "Remove Data Row",
+                                                "Add Table Column",
+                                                "Remove Table Column"
                                             })
             };
         }                                                     
@@ -112,14 +119,14 @@ public class RecordController : Controller
         return View("ModifyDataStep1", ObjectPool.ModifyDataStep1ViewModel);
     }
 
-    [HttpGet, ActionName("AddDataPointStep1")]
-    public IActionResult AddDataPointStep1()
+    [HttpGet, ActionName("AddDataRowStep1")]
+    public IActionResult AddDataRowStep1()
     {
         return View("AddDataStep1", ObjectPool.AddDataStep1ViewModel);
     }
 
-    [HttpGet, ActionName("AddDataPointStep2")]
-    public IActionResult AddDataPointStep2()
+    [HttpGet, ActionName("AddDataRowStep2")]
+    public IActionResult AddDataRowStep2()
     {
         return View("RecordShortcuts");
     }
@@ -132,6 +139,18 @@ public class RecordController : Controller
 
     [HttpGet, ActionName("DeleteColumnStep2")]
     public IActionResult DeleteColumnStep2()
+    {
+        return View("RecordShortcuts");
+    }
+
+    [HttpGet, ActionName("RemoveDataRowStep1")]
+    public IActionResult RemoveDataRowStep1()
+    {
+        return View("RemoveDataStep1", ObjectPool.RemoveDataRowStep1ViewModel);
+    }
+
+    [HttpGet, ActionName("RemoveDataRowStep2")]
+    public IActionResult RemoveDataRowStep2()
     {
         return View("RecordShortcuts");
     }
@@ -250,7 +269,7 @@ public class RecordController : Controller
     {
         switch (mTVM.TableTask)
         {
-            case "Add Data Point":
+            case "Add Data Row":
                 {
                     Row curRow = new Row()
                     {
@@ -268,7 +287,27 @@ public class RecordController : Controller
                         Row = curRow
                     };
 
-                    return RedirectToAction("AddDataPointStep1");
+                    return RedirectToAction("AddDataRowStep1");
+                }
+            case "Remove Data Row":
+                {
+                    ObjectPool.RemoveDataRowStep1ViewModel = new RemoveDataRowStep1ViewModel()
+                    {
+                        Table = new Table()
+                        {
+                            Name = mTVM.TableName,
+                            NumberOfColumns = GetColumns(mTVM.TableName).Count,
+                            Columns = GetColumns(mTVM.TableName)
+                        },
+                        Rows = GetTableRows(mTVM.TableName),
+                        DeleteRowId = 0
+                    };
+
+                    return RedirectToAction("RemoveDataRowStep1");
+                }
+            case "Add Table Column":
+                {
+                    return View("RecordShortcuts");
                 }
             case "Delete Table Column":
                 {
@@ -300,10 +339,10 @@ public class RecordController : Controller
 
             AddRowToXmlDb();
 
-            return RedirectToAction("AddDataPointStep2");
+            return RedirectToAction("AddDataRowStep2");
         }
 
-        return RedirectToAction("AddDataPointStep1");
+        return RedirectToAction("AddDataRowStep1");
     }
 
     [HttpPost, ActionName("DeleteTableColumn")]
@@ -319,6 +358,21 @@ public class RecordController : Controller
         }
 
         return RedirectToAction("DeleteColumnStep1");
+    }
+
+    [HttpPost, ActionName("DeleteTableRow")]
+    [ValidateAntiForgeryToken]
+    public IActionResult DeleteTableRow(RemoveDataRowStep1ViewModel rDVM)
+    {
+        if (ModelState.IsValid)
+        {
+            ObjectPool.RemoveDataRowStep1ViewModel.DeleteRowId = rDVM.DeleteRowId + 1;
+            DeleteRowFromXmlDb(ObjectPool.RemoveDataRowStep1ViewModel.Table.Name);
+
+            return RedirectToAction("RemoveDataRowStep2");
+        }
+
+        return RedirectToAction("RemoveDataRowStep1");
     }
     #endregion
 
@@ -462,6 +516,30 @@ public class RecordController : Controller
                        .RemoveChild(dataPoints[i2]);
                     break;
                 }
+            }
+        }
+
+        xml.Save(databasePath);
+    }
+
+    private void DeleteRowFromXmlDb(string tableName)
+    {
+        string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
+        XmlDocument xml = new XmlDocument();
+
+        xml.Load(databasePath);
+
+        XmlNodeList? rows = xml.DocumentElement
+                               .SelectNodes($"//database/table[@name='{tableName}']/Row");
+
+        for (int i = 0; i < rows.Count; i++)
+        {
+            if (int.Parse(rows[i].Attributes["id"].Value) == ObjectPool.RemoveDataRowStep1ViewModel.DeleteRowId)
+            {
+                xml.DocumentElement
+                   .SelectSingleNode($"//database/table[@name='{tableName}']")
+                   .RemoveChild(rows[i]);
+                break;
             }
         }
 
