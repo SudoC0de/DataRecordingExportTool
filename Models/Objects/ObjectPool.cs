@@ -12,4 +12,6 @@ public static class ObjectPool
     public static DisplayTableStep1ViewModel? DisplayTableStep1ViewModel { get; set; } = null;
     public static DisplayTableStep2ViewModel? DisplayTableStep2ViewModel { get; set; } = null;
     public static RemoveDataRowStep1ViewModel? RemoveDataRowStep1ViewModel { get; set; } = null;
+    public static AddColumnStep1ViewModel? AddColumnStep1ViewModel { get; set; } = null;
+    public static AddColumnStep2ViewModel? AddColumnStep2ViewModel { get; set; } = null;
 }

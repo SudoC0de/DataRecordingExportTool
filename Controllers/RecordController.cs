@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Xml;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Diagnostics.Eventing.Reader;
-using System.ComponentModel.Design.Serialization;
 using DataRecordingExportTool.Models.ViewModels;
 using DataRecordingExportTool.Models.Objects;
 
@@ -45,6 +43,16 @@ public class RecordController : Controller
         {
             ObjectPool.RemoveDataRowStep1ViewModel.Cleanup();
             ObjectPool.RemoveDataRowStep1ViewModel = null;
+        }
+        if (ObjectPool.AddColumnStep1ViewModel  != null)
+        {
+            ObjectPool.AddColumnStep1ViewModel.Cleanup();
+            ObjectPool.AddColumnStep1ViewModel = null;
+        }
+        if (ObjectPool.AddColumnStep2ViewModel != null)
+        {
+            ObjectPool.AddColumnStep2ViewModel.Cleanup();
+            ObjectPool.AddColumnStep2ViewModel = null;
         }
 
         if (ObjectPool.Tables.ContainsKey("TableCreate"))
@@ -153,6 +161,12 @@ public class RecordController : Controller
     public IActionResult RemoveDataRowStep2()
     {
         return View("RecordShortcuts");
+    }
+
+    [HttpGet, ActionName("AddColumnStep1")]
+    public IActionResult AddColumnStep1()
+    {
+        return View("AddColumnStep1", ObjectPool.AddColumnStep1ViewModel);
     }
     #endregion
 
@@ -307,7 +321,21 @@ public class RecordController : Controller
                 }
             case "Add Table Column":
                 {
-                    return View("RecordShortcuts");
+                    ObjectPool.AddColumnStep1ViewModel = new AddColumnStep1ViewModel()
+                    {
+                        Table = new Table()
+                        {
+                            Name = mTVM.TableName,
+                            NumberOfColumns = GetColumns(mTVM.TableName).Count,
+                            Columns = GetColumns(mTVM.TableName)
+                        },
+                        Column = new Column()
+                        {
+                            Name = string.Empty
+                        }
+                    };
+
+                    return RedirectToAction("AddColumnStep1");
                 }
             case "Delete Table Column":
                 {
@@ -609,7 +637,7 @@ public class RecordController : Controller
 
         if (nodes != null)
         {
-            var tableNames = new List<string>(0);
+            List<string> tableNames = new List<string>(0);
 
             foreach (XmlNode node in nodes)
             {
