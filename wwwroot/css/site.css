@@ -20,3 +20,10 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%
+}

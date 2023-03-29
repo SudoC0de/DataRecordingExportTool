@@ -2,32 +2,54 @@
     ViewData["Title"] = "Data Recording";
 }
 
-<div align="center">
-    <h2>Data Recording</h2>
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+</style>
 
-    <table>
-        <thead></thead>
+<div class="container">
+    <table class="text-center">
         <tbody>
             <tr>
                 <td>
-                    <a class="btn btn-primary" asp-area="" asp-controller="Record" asp-action="CreateTableStep1">
-                        Create Table
-                    </a>
+                    <h2>Data Recording</h2>
                 </td>
+            </tr>
+            <tr>
                 <td>
-                    <a class="btn btn-primary" asp-area="" asp-controller="Record" asp-action="DisplayTableStep1">
-                        Display Table
-                    </a>
-                </td>
-                <td>
-                    <a class="btn btn-primary" asp-area="" asp-controller="Record" asp-action="ModifyDataStep1">
-                        Modify Data
-                    </a>
-                </td>
-                <td>
-                    <a class="btn btn-primary" asp-area="" asp-controller="Record" asp-action="DeleteTableStep1">
-                        Delete Table
-                    </a>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <a class="btn btn-primary" asp-area="" asp-controller="Record" asp-action="CreateTableStep1">
+                                        Create Table
+                                    </a>
+                                </td>
+                                <td>
+                                    <a class="btn btn-primary" asp-area="" asp-controller="Record" asp-action="DisplayTableStep1">
+                                        Display Table
+                                    </a>
+                                </td>
+                                <td>
+                                    <a class="btn btn-primary" asp-area="" asp-controller="Record" asp-action="ModifyDataStep1">
+                                        Modify Data
+                                    </a>
+                                </td>
+                                <td>
+                                    <a class="btn btn-primary" asp-area="" asp-controller="Record" asp-action="DeleteTableStep1">
+                                        Delete Table
+                                    </a>
+                                </td>
+                                <td>
+                                    <a class="btn btn-primary" asp-area="" asp-controller="Record" asp-action="ExportTableStep1">
+                                        Export Table
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </td>
             </tr>
         </tbody>

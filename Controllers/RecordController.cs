@@ -54,6 +54,11 @@ public class RecordController : Controller
             ObjectPool.AddColumnStep2ViewModel.Cleanup();
             ObjectPool.AddColumnStep2ViewModel = null;
         }
+        if (ObjectPool.ExportTableViewModel != null)
+        {
+            ObjectPool.ExportTableViewModel.Cleanup();
+            ObjectPool.ExportTableViewModel = null;
+        }
 
         if (ObjectPool.Tables.ContainsKey("TableCreate"))
         {
@@ -205,6 +210,28 @@ public class RecordController : Controller
 
     [HttpGet, ActionName("DisplayTableStep3")]
     public IActionResult DisplayTableStep3()
+    {
+        return View("RecordShortcuts");
+    }
+    #endregion
+
+    #region Export Table
+    [HttpGet, ActionName("ExportTableStep1")]
+    public IActionResult ExportTableStep1()
+    {
+        if (ObjectPool.ExportTableViewModel == null)
+        {
+            ObjectPool.ExportTableViewModel = new ExportTableViewModel()
+            {
+                TableNames = new SelectList(GetTableNames())
+            };
+        }
+
+        return View("ExportTableStep1", ObjectPool.ExportTableViewModel);
+    }
+
+    [HttpGet, ActionName("ExportTableStep2")]
+    public IActionResult ExportTableStep2()
     {
         return View("RecordShortcuts");
     }
@@ -511,6 +538,26 @@ public class RecordController : Controller
     }
     #endregion
 
+    #region Export Table
+    [HttpPost, ActionName("ExportTable")]
+    [ValidateAntiForgeryToken]
+    public IActionResult ExportingTable(ExportTableViewModel eVM)
+    {
+        SaveTable(eVM.TableName);
+
+        string exportPath = Path.Combine(_webEnvironmentRootDirectory, "Export.csv");
+
+        if (System.IO.File.Exists(exportPath))
+        {
+            return PhysicalFile(exportPath, "text/csv", Path.GetFileName(exportPath));
+        }
+        else
+        {
+            return RedirectToAction("ExportTableStep1");
+        }
+    }
+    #endregion
+
     #endregion
 
     #region Helpers
@@ -693,6 +740,59 @@ public class RecordController : Controller
         }
 
         xml.Save(databasePath);
+    }
+
+    private void SaveTable(string tableName)
+    {
+        string exportPath = Path.Combine(_webEnvironmentRootDirectory, "Export.csv");
+
+        using (StreamWriter writer = new StreamWriter(exportPath, false))
+        {
+            string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
+            XmlDocument xml = new XmlDocument();
+
+            xml.Load(databasePath);
+
+            XmlNode? headerNode = xml.DocumentElement
+                                     .SelectSingleNode($"//database/table[@name='{tableName}']/header");
+            string headerRow = string.Empty;
+
+            for(int i = 0; i < headerNode.ChildNodes.Count; i++)
+            {
+                if (i != (headerNode.ChildNodes.Count - 1))
+                {
+                    headerRow = string.Concat(headerRow, headerNode.ChildNodes[i].Attributes["name"].Value, ",");
+                }
+                else
+                {
+                    headerRow = string.Concat(headerRow, headerNode.ChildNodes[i].Attributes["name"].Value);
+                }
+            }
+
+            writer.WriteLine(headerRow);
+
+            XmlNodeList? rowNodes = xml.DocumentElement
+                                       .SelectNodes($"//database/table[@name='{tableName}']/Row");
+
+            foreach(XmlNode rowNode in rowNodes)
+            {
+                string rowData = string.Empty;
+
+                for (int i = 0; i < rowNode.ChildNodes.Count; i++)
+                {
+                    if (i != (rowNode.ChildNodes.Count - 1))
+                    {
+                        rowData = string.Concat(rowData, rowNode.ChildNodes[i].Attributes["data"].Value, ",");
+                    }
+                    else
+                    {
+                        rowData = string.Concat(rowData, rowNode.ChildNodes[i].Attributes["data"].Value);
+                    }
+                }
+
+                writer.WriteLine(rowData);
+            }
+        }
     }
 
     private bool DoesTableExist(string tableName)
