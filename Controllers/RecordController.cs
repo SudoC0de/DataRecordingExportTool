@@ -168,6 +168,18 @@ public class RecordController : Controller
     {
         return View("AddColumnStep1", ObjectPool.AddColumnStep1ViewModel);
     }
+
+    [HttpGet, ActionName("AddColumnStep2")]
+    public IActionResult AddColumnStep2()
+    {
+        return View("AddColumnStep2", ObjectPool.AddColumnStep2ViewModel);
+    }
+
+    [HttpGet, ActionName("AddColumnStep3")]
+    public IActionResult AddColumnStep3()
+    {
+        return View("RecordShortcuts");
+    }
     #endregion
 
     #region Display Table
@@ -402,6 +414,69 @@ public class RecordController : Controller
 
         return RedirectToAction("RemoveDataRowStep1");
     }
+
+    [HttpPost, ActionName("GoToAddColumnStep2")]
+    [ValidateAntiForgeryToken]
+    public IActionResult GoToAddColumnStep2(AddColumnStep1ViewModel aCVM)
+    {
+        if (ModelState.IsValid)
+        {
+            ObjectPool.AddColumnStep2ViewModel = new AddColumnStep2ViewModel()
+            {
+                Table = new Table()
+                {
+                    Name = aCVM.Table.Name,
+                    NumberOfColumns = GetColumnNames(aCVM.Table.Name).Count + 1,
+                    Columns = GetColumns(aCVM.Table.Name)
+                },
+                TableRows = GetTableRows(aCVM.Table.Name)
+            };
+
+            ObjectPool.AddColumnStep2ViewModel.Table.Columns.Add(aCVM.Column);
+
+            for (int rowIndex = 0; rowIndex < ObjectPool.AddColumnStep2ViewModel.TableRows.Count; rowIndex++)
+            {
+                ObjectPool.AddColumnStep2ViewModel.TableRows[rowIndex].Columns.Add(aCVM.Column);
+                ObjectPool.AddColumnStep2ViewModel.TableRows[rowIndex].DataPoints.Add(new DataPoint() { Data = "NA" });
+            }
+
+            ObjectPool.AddColumnStep1ViewModel.Cleanup();
+            ObjectPool.AddColumnStep1ViewModel = null;
+
+            return RedirectToAction("AddColumnStep2");
+        }
+
+        return RedirectToAction("AddColumnStep1");
+    }
+
+    [HttpPost, ActionName("GoToAddColumnStep3")]
+    [ValidateAntiForgeryToken]
+    public IActionResult GoToAddColumnStep3(AddColumnStep2ViewModel aCVM)
+    {
+        for (int rowIndex = 0; rowIndex < ObjectPool.AddColumnStep2ViewModel.TableRows.Count; rowIndex++)
+        {
+            for (int rowColIndex = 0; rowColIndex < ObjectPool.AddColumnStep2ViewModel.TableRows[rowIndex].Columns.Count; rowColIndex++)
+            {
+                if (string.Equals(ObjectPool.AddColumnStep2ViewModel.TableRows[rowIndex].DataPoints[rowColIndex].Data, "NA"))
+                {
+                    ObjectPool.AddColumnStep2ViewModel.TableRows[rowIndex].DataPoints[rowColIndex].Data = aCVM.TableRows[rowIndex].DataPoints[rowColIndex].Data;
+                }
+            }
+        }
+
+        if (ObjectPool.AddColumnStep2ViewModel.TableRows.Any(r => r.DataPoints.Any(d => d.Data == "NA")))
+        {
+            return RedirectToAction("AddColumnStep2");
+        }
+        else
+        {
+            AddColumnToXmlDb();
+            ObjectPool.AddColumnStep2ViewModel.Cleanup();
+            ObjectPool.AddColumnStep2ViewModel = null;
+
+            return RedirectToAction("AddColumnStep3");
+        }
+    }
     #endregion
 
     #region Display Table
@@ -506,6 +581,44 @@ public class RecordController : Controller
         xml.Save(databasePath);
     }
 
+    private void AddColumnToXmlDb()
+    {
+        string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
+        XmlDocument xml = new XmlDocument();
+
+        xml.Load(databasePath);
+
+        XmlNode headerNode = xml.DocumentElement
+                                .SelectSingleNode($"//database/table[@name='{ObjectPool.AddColumnStep2ViewModel.Table.Name}']/header");
+        XmlElement newColumn = xml.CreateElement("Column");
+        XmlAttribute newColumnName = xml.CreateAttribute("name");
+
+        newColumnName.Value = ObjectPool.AddColumnStep2ViewModel.Table.Columns[ObjectPool.AddColumnStep2ViewModel.Table.NumberOfColumns - 1].Name;
+        newColumn.Attributes.Append(newColumnName);
+        headerNode.AppendChild(newColumn);
+
+        XmlNodeList rowNodes = xml.DocumentElement
+                                  .SelectNodes($"//database/table[@name='{ObjectPool.AddColumnStep2ViewModel.Table.Name}']/Row");
+
+        for (int i = 0; i < rowNodes.Count; i++)
+        {
+            XmlElement newDataPoint = xml.CreateElement("DataPoint");
+            XmlAttribute newDataPointName = xml.CreateAttribute("name");
+            XmlAttribute newDataPointData = xml.CreateAttribute("data");
+
+            newDataPointName.Value = newColumnName.Value;
+            newDataPointData.Value = ObjectPool.AddColumnStep2ViewModel
+                                               .TableRows[i]
+                                               .DataPoints[ObjectPool.AddColumnStep2ViewModel.Table.NumberOfColumns - 1]
+                                               .Data;
+            newDataPoint.Attributes.Append(newDataPointName);
+            newDataPoint.Attributes.Append(newDataPointData);
+            rowNodes[i].AppendChild(newDataPoint);
+        }
+
+        xml.Save(databasePath);
+    }
+
     private void DeleteColumnFromXmlDb()
     {
         string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
@@ -569,6 +682,14 @@ public class RecordController : Controller
                    .RemoveChild(rows[i]);
                 break;
             }
+        }
+
+        rows = xml.DocumentElement
+                  .SelectNodes($"//database/table[@name='{tableName}']/Row");
+
+        for (int newRowID = 0; newRowID < rows.Count; newRowID++)
+        {
+            rows[newRowID].Attributes["id"].Value = $"{newRowID + 1}";
         }
 
         xml.Save(databasePath);

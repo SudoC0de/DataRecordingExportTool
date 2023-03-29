@@ -7,7 +7,7 @@
 }
 
 <div align="center">
-    <form>
+    <form asp-action="GoToAddColumnStep2">
         <table>
             <tbody>
                 <tr>
@@ -32,6 +32,13 @@
                                         <input asp-for="@Model.Column.Name" class="form-control" />
                                         <span asp-validation-for="@Model.Column.Name" class="text-danger" />
                                     </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="hidden" asp-for="@Model.Table.Name" class="form-control" />
+                                    <input type="hidden" asp-for="@Model.Table.NumberOfColumns" class="form-control" />
+                                    <input type="hidden" asp-for="@Model.Table.Columns" class="form-control" />
                                 </td>
                             </tr>
                         </tbody>
