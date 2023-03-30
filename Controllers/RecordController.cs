@@ -376,7 +376,7 @@ public class RecordController : Controller
 
                     return RedirectToAction("AddColumnStep1");
                 }
-            case "Delete Table Column":
+            case "Remove Table Column":
                 {
                     ObjectPool.DeleteColumnStep1ViewModel = new DeleteColumnStep1ViewModel()
                     {
@@ -446,34 +446,29 @@ public class RecordController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult GoToAddColumnStep2(AddColumnStep1ViewModel aCVM)
     {
-        if (ModelState.IsValid)
+        ObjectPool.AddColumnStep2ViewModel = new AddColumnStep2ViewModel()
         {
-            ObjectPool.AddColumnStep2ViewModel = new AddColumnStep2ViewModel()
+            Table = new Table()
             {
-                Table = new Table()
-                {
-                    Name = aCVM.Table.Name,
-                    NumberOfColumns = GetColumnNames(aCVM.Table.Name).Count + 1,
-                    Columns = GetColumns(aCVM.Table.Name)
-                },
-                TableRows = GetTableRows(aCVM.Table.Name)
-            };
+                Name = aCVM.Table.Name,
+                NumberOfColumns = GetColumnNames(aCVM.Table.Name).Count + 1,
+                Columns = GetColumns(aCVM.Table.Name)
+            },
+            TableRows = GetTableRows(aCVM.Table.Name)
+        };
 
-            ObjectPool.AddColumnStep2ViewModel.Table.Columns.Add(aCVM.Column);
+        ObjectPool.AddColumnStep2ViewModel.Table.Columns.Add(aCVM.Column);
 
-            for (int rowIndex = 0; rowIndex < ObjectPool.AddColumnStep2ViewModel.TableRows.Count; rowIndex++)
-            {
-                ObjectPool.AddColumnStep2ViewModel.TableRows[rowIndex].Columns.Add(aCVM.Column);
-                ObjectPool.AddColumnStep2ViewModel.TableRows[rowIndex].DataPoints.Add(new DataPoint() { Data = "NA" });
-            }
-
-            ObjectPool.AddColumnStep1ViewModel.Cleanup();
-            ObjectPool.AddColumnStep1ViewModel = null;
-
-            return RedirectToAction("AddColumnStep2");
+        for (int rowIndex = 0; rowIndex < ObjectPool.AddColumnStep2ViewModel.TableRows.Count; rowIndex++)
+        {
+            ObjectPool.AddColumnStep2ViewModel.TableRows[rowIndex].Columns.Add(aCVM.Column);
+            ObjectPool.AddColumnStep2ViewModel.TableRows[rowIndex].DataPoints.Add(new DataPoint() { Data = "NA" });
         }
 
-        return RedirectToAction("AddColumnStep1");
+        ObjectPool.AddColumnStep1ViewModel.Cleanup();
+        ObjectPool.AddColumnStep1ViewModel = null;
+
+        return RedirectToAction("AddColumnStep2");
     }
 
     [HttpPost, ActionName("GoToAddColumnStep3")]

@@ -8,7 +8,11 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
@@ -25,5 +29,22 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%
+    height: 100%;
+    color: white;
+}
+
+.btn-primary {
+    color: white;
+    background-color: dimgray;
+    border-color: white;
+}
+
+.btn-primary:hover {
+    color: white;
+    background-color: slategray;
+    border-color: white;
+}
+
+.nav-item {
+    border-color: white
 }

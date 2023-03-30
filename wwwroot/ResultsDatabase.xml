@@ -35,13 +35,13 @@
   </table>
   <table name="DataTableTest4">
     <header>
-      <Column name="Data_1" />
+      <Column name="NewColumn" />
     </header>
     <Row id="1">
-      <DataPoint name="Data_1" data="9675" />
+      <DataPoint name="NewColumn" data="Stuff" />
     </Row>
     <Row id="2">
-      <DataPoint name="Data_1" data="42" />
+      <DataPoint name="NewColumn" data="Data" />
     </Row>
   </table>
 </database>
