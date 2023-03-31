@@ -2,3 +2,11 @@ bin/Debug/
 obj/Debug/
 .vs/
 obj/
+bin/Release/
+bin/Desktop/
+bin/DataRecordingExportTool_Linux/
+bin/DataRecordingExportTool_Windows/
+bin/x64/Debug/
+bin/x64/Release/
+bin/DataRecordingExportTool_Linux.7z
+bin/DataRecordingExportTool_Windows.zip

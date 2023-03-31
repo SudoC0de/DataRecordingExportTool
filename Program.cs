@@ -1,5 +1,9 @@
+using ElectronNET.API;
+using ElectronNET.API.Entities;
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseElectron(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -32,4 +36,11 @@ app.MapControllerRoute(
     name:"Export",
     pattern: "{controller=Export}/{action=Index}/{id?}");
 
-app.Run();
+//app.Run();
+
+await app.StartAsync();
+
+// Open the Electron-Window here
+await Electron.WindowManager.CreateWindowAsync();
+
+app.WaitForShutdown();
