@@ -8,5 +8,13 @@ namespace DataRecordingExportTool.Models.ViewModels
         public SelectList? TableNames { get; set; }
         public string? TableTask { get; set; }
         public SelectList? TableTasks { get; set; }
+
+        public void Cleanup()
+        {
+            TableName = null;
+            TableNames = null;
+            TableTask = null;
+            TableTasks = null;
+        }
     }
 }

@@ -6,5 +6,11 @@ namespace DataRecordingExportTool.Models.ViewModels
     {
         public string? TableName { get; set; }
         public SelectList? TableNames { get; set; }
+
+        public void Cleanup()
+        {
+            TableName = null;
+            TableNames = null;
+        }
     }
 }

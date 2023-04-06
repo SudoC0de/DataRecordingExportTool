@@ -13,13 +13,19 @@
 </style>
 
 <div class="container">
-    <div>
-        Result Table Deletion
-    </div>
     <form asp-action="DeleteTableGoToStep2">
         <table>
             <tr>
-                <select asp-for="TableName" asp-items="Model.TableNames"></select>
+                <td>
+                    <div>
+                        Result Table Deletion
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <select asp-for="TableName" asp-items="Model.TableNames"></select>
+                </td>
             </tr>
             <tr>
                 <td>

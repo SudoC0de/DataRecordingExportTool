@@ -1,47 +1,46 @@
 <database>
-  <table name="DataTableTest">
-    <header>
-      <Column name="Test1" />
-      <Column name="Test2" />
-      <Column name="Test3" />
-    </header>
-  </table>
-  <table name="DataTableTest2">
-    <header>
-      <Column name="Test1" />
-      <Column name="Test2" />
-      <Column name="Test3" />
-    </header>
-  </table>
-  <table name="DataTableTest3">
-    <header>
-      <Column name="Test1" />
-      <Column name="Test3" />
-      <Column name="TestColumn" />
-      <Column name="NewColumnNameHere" />
-    </header>
-    <Row id="1">
-      <DataPoint name="Test1" data="1.3" />
-      <DataPoint name="Test3" data="9001" />
-      <DataPoint name="TestColumn" data="42" />
-      <DataPoint name="NewColumnNameHere" data="5" />
-    </Row>
-    <Row id="2">
-      <DataPoint name="Test1" data="1" />
-      <DataPoint name="Test3" data="2" />
-      <DataPoint name="TestColumn" data="9" />
-      <DataPoint name="NewColumnNameHere" data="3" />
-    </Row>
-  </table>
-  <table name="DataTableTest4">
-    <header>
-      <Column name="NewColumn" />
-    </header>
-    <Row id="1">
-      <DataPoint name="NewColumn" data="Stuff" />
-    </Row>
-    <Row id="2">
-      <DataPoint name="NewColumn" data="Data" />
-    </Row>
-  </table>
+	<table name="DataTableTest">
+		<header>
+			<Column name="Test1" />
+			<Column name="Test2" />
+			<Column name="Test3" />
+		</header>
+		<Row id="1">
+			<DataPoint name="Test1" data="9" />
+			<DataPoint name="Test2" data="9" />
+			<DataPoint name="Test3" data="9" />
+		</Row>
+	</table>
+	<table name="DataTableTest2">
+		<header>
+			<Column name="Test1" />
+			<Column name="Test2" />
+			<Column name="Test3" />
+		</header>
+	</table>
+	<table name="DataTableTest3">
+		<header>
+			<Column name="Test1" />
+			<Column name="Test3" />
+		</header>
+		<Row id="1">
+			<DataPoint name="Test1" data="1.3" />
+			<DataPoint name="Test3" data="9001" />
+		</Row>
+		<Row id="2">
+			<DataPoint name="Test1" data="1" />
+			<DataPoint name="Test3" data="2" />
+		</Row>
+	</table>
+	<table name="DataTableTest4">
+		<header>
+			<Column name="NewColumn" />
+		</header>
+		<Row id="1">
+			<DataPoint name="NewColumn" data="Stuff" />
+		</Row>
+		<Row id="2">
+			<DataPoint name="NewColumn" data="Data" />
+		</Row>
+	</table>
 </database>

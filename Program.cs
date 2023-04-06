@@ -1,5 +1,4 @@
 using ElectronNET.API;
-using ElectronNET.API.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,9 +37,8 @@ app.MapControllerRoute(
 
 //app.Run();
 
-await app.StartAsync();
-
 // Open the Electron-Window here
 await Electron.WindowManager.CreateWindowAsync();
+await app.StartAsync();
 
 app.WaitForShutdown();

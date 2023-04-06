@@ -17,73 +17,31 @@ public class RecordController : Controller
 
     #region HttpGet
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        if (ObjectPool.DeleteViewModel != null)
-        {
-            ObjectPool.DeleteViewModel = null;
-        }
-        if (ObjectPool.ModifyDataStep1ViewModel != null)
-        {
-            ObjectPool.ModifyDataStep1ViewModel = null;
-        }
-        if (ObjectPool.AddDataStep1ViewModel != null)
-        {
-            ObjectPool.AddDataStep1ViewModel = null;
-        }
-        if (ObjectPool.DisplayTableStep1ViewModel != null)
-        {
-            ObjectPool.DisplayTableStep1ViewModel = null;
-        }
-        if (ObjectPool.DisplayTableStep2ViewModel != null)
-        {
-            ObjectPool.DisplayTableStep2ViewModel = null;
-        }
-        if (ObjectPool.RemoveDataRowStep1ViewModel != null)
-        {
-            ObjectPool.RemoveDataRowStep1ViewModel.Cleanup();
-            ObjectPool.RemoveDataRowStep1ViewModel = null;
-        }
-        if (ObjectPool.AddColumnStep1ViewModel  != null)
-        {
-            ObjectPool.AddColumnStep1ViewModel.Cleanup();
-            ObjectPool.AddColumnStep1ViewModel = null;
-        }
-        if (ObjectPool.AddColumnStep2ViewModel != null)
-        {
-            ObjectPool.AddColumnStep2ViewModel.Cleanup();
-            ObjectPool.AddColumnStep2ViewModel = null;
-        }
-        if (ObjectPool.ExportTableViewModel != null)
-        {
-            ObjectPool.ExportTableViewModel.Cleanup();
-            ObjectPool.ExportTableViewModel = null;
-        }
-
-        if (ObjectPool.Tables.ContainsKey("TableCreate"))
-        {
-            ObjectPool.Tables["TableCreate"] = new Table();
-        }
+        CleanupObjectPool();
 
         return View("RecordShortcuts");
     }
 
     #region Create Table
     [HttpGet, ActionName("CreateTableStep1")]
-    public IActionResult CreateTableStep1()
+    public async Task<IActionResult> CreateTableStep1()
     {
         return View("CreateTableStep1");
     }
 
     [HttpGet, ActionName("CreateTableStep2")]
-    public IActionResult CreateTableStep2()
+    public async Task<IActionResult> CreateTableStep2()
     {
         return View("CreateTableStep2", ObjectPool.Tables["TableCreate"]);
     }
 
     [HttpGet, ActionName("CreateTableStep3")]
-    public IActionResult CreateTableStep3()
+    public async Task<IActionResult> CreateTableStep3()
     {
+        CleanupObjectPool();
+
         return View("RecordShortcuts");
     }
     #endregion
@@ -104,15 +62,17 @@ public class RecordController : Controller
     }
 
     [HttpGet, ActionName("DeleteTableStep2")]
-    public IActionResult DeleteTableStep2()
+    public async Task<IActionResult> DeleteTableStep2()
     {
+        CleanupObjectPool();
+
         return View("RecordShortcuts");
     }
     #endregion
 
     #region Modify Table
     [HttpGet, ActionName("ModifyDataStep1")]
-    public IActionResult ModifyDataStep1()
+    public async Task<IActionResult> ModifyDataStep1()
     {
         if (ObjectPool.ModifyDataStep1ViewModel ==  null)
         {
@@ -133,63 +93,71 @@ public class RecordController : Controller
     }
 
     [HttpGet, ActionName("AddDataRowStep1")]
-    public IActionResult AddDataRowStep1()
+    public async Task<IActionResult> AddDataRowStep1()
     {
         return View("AddDataStep1", ObjectPool.AddDataStep1ViewModel);
     }
 
     [HttpGet, ActionName("AddDataRowStep2")]
-    public IActionResult AddDataRowStep2()
+    public async Task<IActionResult> AddDataRowStep2()
     {
+        CleanupObjectPool();
+
         return View("RecordShortcuts");
     }
 
     [HttpGet, ActionName("DeleteColumnStep1")]
-    public IActionResult DeleteColumnStep1()
+    public async Task<IActionResult> DeleteColumnStep1()
     {
         return View("DeleteColumnStep1", ObjectPool.DeleteColumnStep1ViewModel);
     }
 
     [HttpGet, ActionName("DeleteColumnStep2")]
-    public IActionResult DeleteColumnStep2()
+    public async Task<IActionResult> DeleteColumnStep2()
     {
+        CleanupObjectPool();
+
         return View("RecordShortcuts");
     }
 
     [HttpGet, ActionName("RemoveDataRowStep1")]
-    public IActionResult RemoveDataRowStep1()
+    public async Task<IActionResult> RemoveDataRowStep1()
     {
         return View("RemoveDataStep1", ObjectPool.RemoveDataRowStep1ViewModel);
     }
 
     [HttpGet, ActionName("RemoveDataRowStep2")]
-    public IActionResult RemoveDataRowStep2()
+    public async Task<IActionResult> RemoveDataRowStep2()
     {
+        CleanupObjectPool();
+
         return View("RecordShortcuts");
     }
 
     [HttpGet, ActionName("AddColumnStep1")]
-    public IActionResult AddColumnStep1()
+    public async Task<IActionResult> AddColumnStep1()
     {
         return View("AddColumnStep1", ObjectPool.AddColumnStep1ViewModel);
     }
 
     [HttpGet, ActionName("AddColumnStep2")]
-    public IActionResult AddColumnStep2()
+    public async Task<IActionResult> AddColumnStep2()
     {
         return View("AddColumnStep2", ObjectPool.AddColumnStep2ViewModel);
     }
 
     [HttpGet, ActionName("AddColumnStep3")]
-    public IActionResult AddColumnStep3()
+    public async Task<IActionResult> AddColumnStep3()
     {
+        CleanupObjectPool();
+
         return View("RecordShortcuts");
     }
     #endregion
 
     #region Display Table
     [HttpGet, ActionName("DisplayTableStep1")]
-    public IActionResult DisplayTableStep1()
+    public async Task<IActionResult> DisplayTableStep1()
     {
         if (ObjectPool.DisplayTableStep1ViewModel == null)
         {
@@ -203,21 +171,23 @@ public class RecordController : Controller
     }
 
     [HttpGet, ActionName("DisplayTableStep2")]
-    public IActionResult DisplayTableStep2()
+    public async Task<IActionResult> DisplayTableStep2()
     {
         return View("DisplayTableStep2", ObjectPool.DisplayTableStep2ViewModel);
     }
 
     [HttpGet, ActionName("DisplayTableStep3")]
-    public IActionResult DisplayTableStep3()
+    public async Task<IActionResult> DisplayTableStep3()
     {
+        CleanupObjectPool();
+
         return View("RecordShortcuts");
     }
     #endregion
 
     #region Export Table
     [HttpGet, ActionName("ExportTableStep1")]
-    public IActionResult ExportTableStep1()
+    public async Task<IActionResult> ExportTableStep1()
     {
         if (ObjectPool.ExportTableViewModel == null)
         {
@@ -231,8 +201,10 @@ public class RecordController : Controller
     }
 
     [HttpGet, ActionName("ExportTableStep2")]
-    public IActionResult ExportTableStep2()
+    public async Task<IActionResult> ExportTableStep2()
     {
+        CleanupObjectPool();
+
         return View("RecordShortcuts");
     }
     #endregion
@@ -244,14 +216,18 @@ public class RecordController : Controller
     #region Create Table
     [HttpPost, ActionName("GoToStep2")]
     [ValidateAntiForgeryToken]
-    public IActionResult GoToCreateResultTableStep2([Bind("Name,NumberOfColumns")]Table table)
+    public async Task<IActionResult> GoToCreateResultTableStep2([Bind("Name,NumberOfColumns")]Table table)
     {
         if (!ModelState.IsValid)
         {
             return View("CreateTableStep1", table);
         }
 
-        if (DoesTableExist(table.Name))
+        bool tableExists = false;
+
+        tableExists = DoesTableExist(table.Name);
+
+        if (tableExists)
         {
             return View("CreateTableStep1", table);
         }
@@ -276,7 +252,7 @@ public class RecordController : Controller
 
     [HttpPost, ActionName("GoToStep3")]
     [ValidateAntiForgeryToken]
-    public IActionResult GoToCreateResultTableStep3(Table table)
+    public async Task<IActionResult> GoToCreateResultTableStep3(Table table)
     {
         for (int i = 0; i < table.Columns.Count; i++)
         {
@@ -304,9 +280,13 @@ public class RecordController : Controller
     #region Delete Table
     [HttpPost, ActionName("DeleteTableGoToStep2")]
     [ValidateAntiForgeryToken]
-    public IActionResult GoToDeleteResultTableStep2(DeleteViewModel dbVM)
+    public async Task<IActionResult> GoToDeleteResultTableStep2(DeleteViewModel dbVM)
     {
-        if (DeleteTable(dbVM.TableName))
+        bool tableDeleted = false;
+
+        tableDeleted = DeleteTable(dbVM.TableName);
+
+        if (tableDeleted)
         {
             return RedirectToAction("DeleteTableStep2");
         }
@@ -318,7 +298,7 @@ public class RecordController : Controller
     #region Modify Table
     [HttpPost, ActionName("ModifyTableGoToStep2")]
     [ValidateAntiForgeryToken]
-    public IActionResult GoToModifyResultTableStep2(ModifyDataStep1ViewModel mTVM)
+    public async Task<IActionResult> GoToModifyResultTableStep2(ModifyDataStep1ViewModel mTVM)
     {
         switch (mTVM.TableTask)
         {
@@ -395,7 +375,7 @@ public class RecordController : Controller
 
     [HttpPost, ActionName("AddDataPoints")]
     [ValidateAntiForgeryToken]
-    public IActionResult AddDataPoints(AddDataStep1ViewModel mTVM)
+    public async Task<IActionResult> AddDataPoints(AddDataStep1ViewModel mTVM)
     {
         if (ModelState.IsValid)
         {
@@ -414,7 +394,7 @@ public class RecordController : Controller
 
     [HttpPost, ActionName("DeleteTableColumn")]
     [ValidateAntiForgeryToken]
-    public IActionResult DeleteTableColumn(DeleteColumnStep1ViewModel mTVM)
+    public async Task<IActionResult> DeleteTableColumn(DeleteColumnStep1ViewModel mTVM)
     {
         if (ModelState.IsValid)
         {
@@ -429,7 +409,7 @@ public class RecordController : Controller
 
     [HttpPost, ActionName("DeleteTableRow")]
     [ValidateAntiForgeryToken]
-    public IActionResult DeleteTableRow(RemoveDataRowStep1ViewModel rDVM)
+    public async Task<IActionResult> DeleteTableRow(RemoveDataRowStep1ViewModel rDVM)
     {
         if (ModelState.IsValid)
         {
@@ -444,36 +424,45 @@ public class RecordController : Controller
 
     [HttpPost, ActionName("GoToAddColumnStep2")]
     [ValidateAntiForgeryToken]
-    public IActionResult GoToAddColumnStep2(AddColumnStep1ViewModel aCVM)
+    public async Task<IActionResult> GoToAddColumnStep2(AddColumnStep1ViewModel aCVM)
     {
-        ObjectPool.AddColumnStep2ViewModel = new AddColumnStep2ViewModel()
-        {
-            Table = new Table()
-            {
-                Name = aCVM.Table.Name,
-                NumberOfColumns = GetColumnNames(aCVM.Table.Name).Count + 1,
-                Columns = GetColumns(aCVM.Table.Name)
-            },
-            TableRows = GetTableRows(aCVM.Table.Name)
-        };
+        List<string> columns = GetColumnNames(aCVM.Table.Name);
 
-        ObjectPool.AddColumnStep2ViewModel.Table.Columns.Add(aCVM.Column);
-
-        for (int rowIndex = 0; rowIndex < ObjectPool.AddColumnStep2ViewModel.TableRows.Count; rowIndex++)
+        if (columns.Contains(aCVM.Column.Name))
         {
-            ObjectPool.AddColumnStep2ViewModel.TableRows[rowIndex].Columns.Add(aCVM.Column);
-            ObjectPool.AddColumnStep2ViewModel.TableRows[rowIndex].DataPoints.Add(new DataPoint() { Data = "NA" });
+            return RedirectToAction("AddColumnStep1");
         }
+        else
+        {
+            ObjectPool.AddColumnStep2ViewModel = new AddColumnStep2ViewModel()
+            {
+                Table = new Table()
+                {
+                    Name = aCVM.Table.Name,
+                    NumberOfColumns = GetColumnNames(aCVM.Table.Name).Count + 1,
+                    Columns = GetColumns(aCVM.Table.Name)
+                },
+                TableRows = GetTableRows(aCVM.Table.Name)
+            };
 
-        ObjectPool.AddColumnStep1ViewModel.Cleanup();
-        ObjectPool.AddColumnStep1ViewModel = null;
+            ObjectPool.AddColumnStep2ViewModel.Table.Columns.Add(aCVM.Column);
 
-        return RedirectToAction("AddColumnStep2");
+            for (int rowIndex = 0; rowIndex < ObjectPool.AddColumnStep2ViewModel.TableRows.Count; rowIndex++)
+            {
+                ObjectPool.AddColumnStep2ViewModel.TableRows[rowIndex].Columns.Add(aCVM.Column);
+                ObjectPool.AddColumnStep2ViewModel.TableRows[rowIndex].DataPoints.Add(new DataPoint() { Data = "NA" });
+            }
+
+            ObjectPool.AddColumnStep1ViewModel.Cleanup();
+            ObjectPool.AddColumnStep1ViewModel = null;
+
+            return RedirectToAction("AddColumnStep2");
+        }
     }
 
     [HttpPost, ActionName("GoToAddColumnStep3")]
     [ValidateAntiForgeryToken]
-    public IActionResult GoToAddColumnStep3(AddColumnStep2ViewModel aCVM)
+    public async Task<IActionResult> GoToAddColumnStep3(AddColumnStep2ViewModel aCVM)
     {
         for (int rowIndex = 0; rowIndex < ObjectPool.AddColumnStep2ViewModel.TableRows.Count; rowIndex++)
         {
@@ -504,7 +493,7 @@ public class RecordController : Controller
     #region Display Table
     [HttpPost, ActionName("DisplayTableGoToToStep2")]
     [ValidateAntiForgeryToken]
-    public IActionResult GoToDisplayTableStep2(DisplayTableStep1ViewModel dTVM)
+    public async Task<IActionResult> GoToDisplayTableStep2(DisplayTableStep1ViewModel dTVM)
     {
         if (ModelState.IsValid)
         {
@@ -527,7 +516,7 @@ public class RecordController : Controller
 
     [HttpPost, ActionName("DisplayTableGoToStep3")]
     [ValidateAntiForgeryToken]
-    public IActionResult GoToDisplayTableStep3()
+    public async Task<IActionResult> GoToDisplayTableStep3()
     {
         return RedirectToAction("DisplayTableStep3");
     }
@@ -536,7 +525,7 @@ public class RecordController : Controller
     #region Export Table
     [HttpPost, ActionName("ExportTable")]
     [ValidateAntiForgeryToken]
-    public IActionResult ExportingTable(ExportTableViewModel eVM)
+    public async Task<IActionResult> ExportingTable(ExportTableViewModel eVM)
     {
         SaveTable(eVM.TableName);
 
@@ -559,13 +548,13 @@ public class RecordController : Controller
     private void AddTableToXmlDb()
     {
         string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
-        XmlDocument xml = new XmlDocument();
+        XmlDocument? xml = new XmlDocument();
 
         xml.Load(databasePath);
 
-        XmlNode rooteNode = xml.DocumentElement;
+        XmlNode rootNode = xml.DocumentElement;
 
-        if (rooteNode != null)
+        if (rootNode != null)
         {
             XmlElement tableElement = xml.CreateElement("table");
             XmlAttribute nameAttri = xml.CreateAttribute("name");
@@ -586,15 +575,38 @@ public class RecordController : Controller
             }
 
             tableElement.AppendChild(headerRowElement);
-            rooteNode.AppendChild(tableElement);
+            rootNode.AppendChild(tableElement);
             xml.Save(databasePath);
+
+            for (int i = 0; i < 30; i++)
+            {
+                bool nodeFound = false;
+
+                foreach(XmlNode node in rootNode.ChildNodes)
+                {
+                    if (node == tableElement)
+                    {
+                        nodeFound = true;
+                        break;
+                    }
+                }
+
+                if (nodeFound)
+                {
+                    break;
+                }
+                else
+                {
+                    Task.WaitAll(Task.Delay(TimeSpan.FromSeconds(1)));
+                }
+            }
         }
     }
 
     private void AddRowToXmlDb()
     {
         string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
-        XmlDocument xml = new XmlDocument();
+        XmlDocument? xml = new XmlDocument();
 
         xml.Load(databasePath);
 
@@ -621,12 +633,38 @@ public class RecordController : Controller
            .SelectSingleNode($"//database/table[@name='{ObjectPool.AddDataStep1ViewModel.TableName}']")
            .AppendChild(rowElement);
         xml.Save(databasePath);
+
+        for (int i = 0; i < 30; i++)
+        {
+            bool isRowFound = false;
+
+            XmlNodeList? rows = xml.DocumentElement
+                                   .SelectNodes($"//database/table[@name='{ObjectPool.AddDataStep1ViewModel.TableName}']/Row");
+
+            foreach(XmlNode row in rows)
+            {
+                if (row == rowElement)
+                {
+                    isRowFound = true;
+                    break;
+                }
+            }
+
+            if (isRowFound)
+            {
+                break;
+            }
+            else
+            {
+                Task.WaitAll(Task.Delay(TimeSpan.FromSeconds(1)));
+            }
+        }
     }
 
     private void AddColumnToXmlDb()
     {
         string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
-        XmlDocument xml = new XmlDocument();
+        XmlDocument? xml = new XmlDocument();
 
         xml.Load(databasePath);
 
@@ -659,12 +697,51 @@ public class RecordController : Controller
         }
 
         xml.Save(databasePath);
+
+        XmlNodeList nodes = xml.DocumentElement
+                               .SelectNodes($"//database/table[@name='{ObjectPool.AddColumnStep2ViewModel.Table.Name}']/header/Column");
+
+        for (int i = 0; i < 30; i++)
+        {
+            if (string.Equals(nodes[nodes.Count - 1].Attributes["name"].Value, newColumnName.Value))
+            {
+                break;
+            }
+            else
+            {
+                Task.WaitAll(Task.Delay(TimeSpan.FromSeconds(1)));
+            }
+        }
+
+        rowNodes = xml.DocumentElement
+                      .SelectNodes($"//database/table[@name='{ObjectPool.AddColumnStep2ViewModel.Table.Name}']/Row");
+
+        for (int i = 0; i < rowNodes.Count; i++)
+        {
+            for (int i2 = 0; i2 < 30; i2++)
+            {
+                string? nodeValue = rowNodes[i].ChildNodes[rowNodes[i].ChildNodes.Count - 1].Attributes["data"].Value;
+                string valueEntered = ObjectPool.AddColumnStep2ViewModel
+                                                .TableRows[i]
+                                                .DataPoints[ObjectPool.AddColumnStep2ViewModel.Table.NumberOfColumns - 1]
+                                                .Data;
+
+                if (string.Equals(valueEntered, nodeValue))
+                {
+                    break;
+                }
+                else
+                {
+                    Task.WaitAll(Task.Delay(TimeSpan.FromSeconds(1)));
+                }
+            }
+        }
     }
 
     private void DeleteColumnFromXmlDb()
     {
         string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
-        XmlDocument xml = new XmlDocument();
+        XmlDocument? xml = new XmlDocument();
 
         xml.Load(databasePath);
 
@@ -703,17 +780,63 @@ public class RecordController : Controller
         }
 
         xml.Save(databasePath);
+
+        for (int i = 0; i < 30; i++)
+        {
+            List<string> columns = GetColumnNames(ObjectPool.DeleteColumnStep1ViewModel.TableName);
+
+            if (columns.Contains(ObjectPool.DeleteColumnStep1ViewModel.ColumnName))
+            {
+                Task.WaitAll(Task.Delay(TimeSpan.FromSeconds(1)));
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        List<Row> rows = GetTableRows(ObjectPool.DeleteColumnStep1ViewModel.TableName);
+
+        foreach(Row r in rows)
+        {
+            for (int i = 0; i < 30; i++)
+            {
+                bool isColumnFound = false;
+                XmlNodeList? dataPoints = xml.DocumentElement
+                                             .SelectNodes($"//database/table[@name='{ObjectPool.DeleteColumnStep1ViewModel.TableName}']/Row[@id='{r.Id}']/DataPoint");
+
+                for (int i2 = 0; i2 < dataPoints.Count; i2++)
+                {
+                    if (string.Equals(dataPoints[i2].Attributes["name"].Value, ObjectPool.DeleteColumnStep1ViewModel.ColumnName))
+                    {
+                        isColumnFound = true;
+                        break;
+                    }
+                }
+
+                if (isColumnFound)
+                {
+                    Task.WaitAll(Task.Delay(TimeSpan.FromSeconds(1)));
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
     }
 
     private void DeleteRowFromXmlDb(string tableName)
     {
         string databasePath = Path.Combine(_webEnvironmentRootDirectory, "ResultsDatabase.xml");
-        XmlDocument xml = new XmlDocument();
+        XmlDocument? xml = new XmlDocument();
 
         xml.Load(databasePath);
 
         XmlNodeList? rows = xml.DocumentElement
                                .SelectNodes($"//database/table[@name='{tableName}']/Row");
+        XmlNode deletedRow = xml.DocumentElement
+                                .SelectSingleNode($"//database/table[@name='{tableName}']/Row[@id='{ObjectPool.RemoveDataRowStep1ViewModel.DeleteRowId}']");
 
         for (int i = 0; i < rows.Count; i++)
         {
@@ -735,6 +858,32 @@ public class RecordController : Controller
         }
 
         xml.Save(databasePath);
+
+        for (int i = 0; i < 30; i++)
+        {
+            bool isRowFound = false;
+
+            rows = xml.DocumentElement
+                      .SelectNodes($"//database/table[@name='{tableName}']/Row");
+
+            foreach (XmlNode row in rows)
+            {
+                if (row == deletedRow)
+                {
+                    isRowFound = true;
+                    break;
+                }
+            }
+
+            if (isRowFound)
+            {
+                Task.WaitAll(Task.Delay(TimeSpan.FromSeconds(1)));
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 
     private void SaveTable(string tableName)
@@ -895,12 +1044,29 @@ public class RecordController : Controller
         XmlNode? node = xml.DocumentElement
                            .SelectSingleNode($"//database/table[@name='{tableName}']");
 
-        if (node != null)
-        {
-            xml.DocumentElement.RemoveChild(node);
-            xml.Save(databasePath);
+        xml.DocumentElement.RemoveChild(node);
+        xml.Save(databasePath);
 
-            return true;
+        for (int i = 0; i < 30; i++)
+        {
+            bool isTableFound = false;
+
+            node = xml.DocumentElement
+                      .SelectSingleNode($"//database/table[@name='{tableName}']");
+
+            if (node != null)
+            {
+                isTableFound = true;
+            }
+            
+            if (isTableFound)
+            {
+                Task.WaitAll(Task.Delay(TimeSpan.FromSeconds(1)));
+            }
+            else if (isTableFound == false)
+            {
+                return true;
+            }
         }
 
         return false;
@@ -984,6 +1150,65 @@ public class RecordController : Controller
         }
 
         return dataPoints;
+    }
+
+    private void CleanupObjectPool()
+    {
+        if (ObjectPool.DeleteViewModel != null)
+        {
+            ObjectPool.DeleteViewModel.Cleanup();
+            ObjectPool.DeleteViewModel = null;
+        }
+        if (ObjectPool.ModifyDataStep1ViewModel != null)
+        {
+            ObjectPool.ModifyDataStep1ViewModel.Cleanup();
+            ObjectPool.ModifyDataStep1ViewModel = null;
+        }
+        if (ObjectPool.AddDataStep1ViewModel != null)
+        {
+            ObjectPool.AddDataStep1ViewModel.Cleanup();
+            ObjectPool.AddDataStep1ViewModel = null;
+        }
+        if (ObjectPool.DisplayTableStep1ViewModel != null)
+        {
+            ObjectPool.DisplayTableStep1ViewModel.Cleanup();
+            ObjectPool.DisplayTableStep1ViewModel = null;
+        }
+        if (ObjectPool.DisplayTableStep2ViewModel != null)
+        {
+            ObjectPool.DisplayTableStep2ViewModel.Cleanup();
+            ObjectPool.DisplayTableStep2ViewModel = null;
+        }
+        if (ObjectPool.RemoveDataRowStep1ViewModel != null)
+        {
+            ObjectPool.RemoveDataRowStep1ViewModel.Cleanup();
+            ObjectPool.RemoveDataRowStep1ViewModel = null;
+        }
+        if (ObjectPool.AddColumnStep1ViewModel != null)
+        {
+            ObjectPool.AddColumnStep1ViewModel.Cleanup();
+            ObjectPool.AddColumnStep1ViewModel = null;
+        }
+        if (ObjectPool.AddColumnStep2ViewModel != null)
+        {
+            ObjectPool.AddColumnStep2ViewModel.Cleanup();
+            ObjectPool.AddColumnStep2ViewModel = null;
+        }
+        if (ObjectPool.ExportTableViewModel != null)
+        {
+            ObjectPool.ExportTableViewModel.Cleanup();
+            ObjectPool.ExportTableViewModel = null;
+        }
+        if (ObjectPool.DeleteColumnStep1ViewModel != null)
+        {
+            ObjectPool.DeleteColumnStep1ViewModel.Cleanup();
+            ObjectPool.DeleteColumnStep1ViewModel = null;
+        }
+
+        if (ObjectPool.Tables.ContainsKey("TableCreate"))
+        {
+            ObjectPool.Tables["TableCreate"] = new Table();
+        }
     }
     #endregion
 }

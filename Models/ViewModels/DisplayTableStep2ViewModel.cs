@@ -7,5 +7,12 @@ namespace DataRecordingExportTool.Models.ViewModels
     {
         public Table? Table { get; set; }
         public List<Row>? Rows { get; set; }
+
+        public void Cleanup()
+        {
+            Table = null;
+            Rows.Clear();
+            Rows = null;
+        }
     }
 }
