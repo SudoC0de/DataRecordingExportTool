@@ -1,0 +1,53 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model DataRecordingExportTool.Models.Objects.Table
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+@{
+    ViewData["Title"] = "Table Creation";
+}
+
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+</style>
+
+<div class="container">
+    <form asp-action="GoToStep2">
+        <table>
+            <tbody>
+                <tr>
+                    <td>
+                        <h2>Create Results Database Table</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label"></label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <label asp-for="NumberOfColumns" class="control-label"></label>
+                            <input asp-for="NumberOfColumns" class="form-control" />
+                            <span asp-validation-for="NumberOfColumns" class="text-danger"></span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <input type="submit" value="Next" class="btn btn-primary" />
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>

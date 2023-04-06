@@ -1,9 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using DataRecordingExportTool.Models;
+using ElectronNET.API;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseElectron(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -36,4 +35,10 @@ app.MapControllerRoute(
     name:"Export",
     pattern: "{controller=Export}/{action=Index}/{id?}");
 
-app.Run();
+//app.Run();
+
+// Open the Electron-Window here
+await Electron.WindowManager.CreateWindowAsync();
+await app.StartAsync();
+
+app.WaitForShutdown();

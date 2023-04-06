@@ -1,0 +1,51 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model DataRecordingExportTool.Models.ViewModels.AddDataStep1ViewModel
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+@{
+    ViewData["Title"] = "Table Creation";
+}
+
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+</style>
+
+<div class="container">
+    <form asp-action="AddDataPoints">
+        <table>
+            <tbody>
+                <tr>
+                    <td>
+                        <label>Add Data Result</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Table: </label>
+                        <label>@Model.TableName</label>
+                    </td>
+                </tr>
+                @for (int i = 0; i < Model.Row.Columns.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <label class="control-label">@Model.Row.Columns[i].Name</label>
+                            <input asp-for="@Model.Row.DataPoints[i].Data" class="form-control" />
+                            <span asp-validation-for="@Model.Row.DataPoints[i].Data" class="text-danger"></span>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <input type="submit" value="Add Data Point" class="btn btn-primary" />
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>

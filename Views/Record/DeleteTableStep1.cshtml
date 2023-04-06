@@ -1,0 +1,39 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@model DataRecordingExportTool.Models.ViewModels.DeleteViewModel
+
+@{
+    ViewData["Title"] = "Table Deletion";
+}
+
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+</style>
+
+<div class="container">
+    <form asp-action="DeleteTableGoToStep2">
+        <table>
+            <tr>
+                <td>
+                    <div>
+                        Result Table Deletion
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <select asp-for="TableName" asp-items="Model.TableNames"></select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="form-group">
+                        <input type="submit" value="Delete Result Table" class="btn btn-primary" />
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
