@@ -1,0 +1,45 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@model DataRecordingExportTool.Models.ViewModels.ExportTableViewModel
+
+@{
+    ViewData["Title"] = "Table Export";
+}
+
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+</style>
+
+<div class="container">
+    <form asp-action="ExportTable">
+        <table>
+            <tbody>
+                <tr>
+                    <td>
+                        <div>Export Table</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <select asp-for="TableName" asp-items="Model.TableNames"></select>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="submit" value="Export" class="btn btn-primary" />
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>

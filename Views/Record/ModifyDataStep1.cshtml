@@ -1,0 +1,46 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model DataRecordingExportTool.Models.ViewModels.ModifyDataStep1ViewModel
+
+@{
+    ViewData["Title"] = "Modify Data";
+}
+
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+</style>
+
+<div class="container">
+    <table>
+        <tr>
+            <td>Modify Data Table</td>
+        </tr>
+        <form asp-action="ModifyTableGoToStep2">
+            <tr>
+                <td>
+                    <label>Table</label>
+                </td>
+                <td>
+                    <select asp-for="@Model.TableName" asp-items="@Model.TableNames"></select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Task</label>
+                </td>
+                <td>
+                    <select asp-for="@Model.TableTask" asp-items="@Model.TableTasks"></select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="form-group">
+                        <input type="submit" value="Next" class="btn btn-primary" />
+                    </div>
+                </td>
+            </tr>
+        </form>
+    </table>
+</div>
